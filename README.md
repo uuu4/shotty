@@ -1,5 +1,7 @@
 # Shotty
 
+**[uuu4.github.io/shotty](https://uuu4.github.io/shotty/)**
+
 **An open source, 393-line screenshot tool for macOS.** Capture a region, draw on it, copy
 it — or OCR it with the indentation intact. Small enough to read before you run it.
 
