@@ -55,6 +55,13 @@ nav .links a{transition:color .18s}
 nav .links a:hover{color:var(--text)}
 
 /* hero */
+header .wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:clamp(2rem,5vw,4rem);align-items:center}
+.ascii{font-family:var(--mono);font-size:10px;line-height:1.18;letter-spacing:.06em;
+  white-space:pre;margin:0;user-select:none;color:var(--line-2)}
+.ascii .lit{color:var(--text)}
+.ascii .edge{color:var(--mark)}
+@media (max-width:1000px){header .wrap{grid-template-columns:1fr}.ascii{display:none}}
+
 header{padding:clamp(4rem,11vw,7.5rem) 0 clamp(2.5rem,5vw,3.5rem)}
 h1{
   font-size:clamp(2.3rem,5.6vw,4.25rem); font-weight:700;
@@ -105,8 +112,20 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
 .dot{width:11px;height:11px;border-radius:50%;background:#3A3833}
 
 .screen-title{font-family:var(--mono);font-size:.74rem;color:var(--faint)}
-.code{padding:1.15rem 1.25rem;font-family:var(--mono);font-size:clamp(.66rem,1.15vw,.79rem);line-height:1.75;white-space:pre;overflow:hidden;color:#B9B4A8}
-.code .k{color:#C58AF0}.code .s{color:#8FBF7F}.code .c{color:#8A8579}.code .f{color:#7FB2E5}.code .num{color:#E0A458}
+/* the demo surface: an authored, unbranded app screen, light so the dim reads */
+.ui{background:#F7F6F3;color:#1B1A17;padding:1.1rem 1.2rem 1.3rem;font-size:clamp(.72rem,1.1vw,.84rem)}
+.ui-h{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;
+  padding-bottom:.7rem;margin-bottom:.35rem;border-bottom:1px solid #E2DFD8}
+.ui-t{font-weight:600;letter-spacing:-.01em}
+.ui-s{font-family:var(--mono);font-size:.86em;color:#6F6B62}
+.ck{display:grid;grid-template-columns:16px minmax(0,1fr) auto;align-items:center;gap:.7rem;
+  padding:.52rem 0;border-bottom:1px solid #EDEAE3}
+.ck i{width:11px;height:11px;border-radius:50%;background:#2E9E63}
+.ck.bad i{background:#D8342B}
+.ck b{font-weight:500}
+.ck span{font-family:var(--mono);font-size:.86em;color:#6F6B62}
+.ck.bad b,.ck.bad span{color:#B3231C}
+.ui-f{margin-top:.85rem;font-size:.9em;color:#6F6B62}
 #ovl{position:absolute;inset:36px 0 0 0;pointer-events:none}
 .readout{
   position:absolute;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.7rem;padding:.2rem .45rem;border-radius:3px;
@@ -258,6 +277,7 @@ verdict, DESIGN.md, and every shipping raster
 
 <header id="top">
   <div class="wrap">
+   <div class="hero-copy">
     <h1>A screenshot tool you can read before you run it.</h1>
     <p class="lede">Shotty freezes the screen, dims it, and lets you draw on the region you selected — <strong>before anything reaches your clipboard or your disk</strong>. It also OCRs that region with the indentation intact. It is one Swift file, 393 lines, no dependencies, and it never talks to a server.</p>
 
@@ -279,43 +299,33 @@ verdict, DESIGN.md, and every shipping raster
 <span class="n">0</span><span class="o">     # there is no network code</span></div>
     </div>
     <p class="proof-note">Those three commands are the entire pitch. Run them before you run anything else.</p>
+   </div>
+   <pre class="ascii" id="ascii" aria-hidden="true"></pre>
   </div>
 </header>
 
 <section id="how" class="rule" style="padding-bottom:0">
   <div class="wrap">
     <h2>The gesture, on this page</h2>
-    <p class="sub">Press the hotkey and the screen freezes and dims. Drag a box. Your selection stays lit, and you draw on it there. Nothing has been copied or saved yet, and nothing will be until you say so. Try it below: this is the same interaction, and the screen you are marking up is Shotty's own source.</p>
+    <p class="sub">Press the hotkey and the screen freezes and dims. Drag a box. Your selection stays lit, and you draw on it there. Nothing has been copied or saved yet, and nothing will be until you say so. Try it below on the kind of screen you would actually send
+      someone: drag a box around the check that failed, then draw on it.</p>
   </div>
 </section>
 
 <section id="demo-sec">
   <div class="wrap">
     <div class="screen" id="screen" tabindex="0" role="application" aria-label="Interactive demo of the capture gesture">
-      <div class="screen-bar"><span class="screen-title">main.swift:356–378 &mdash; verbatim, dedented</span></div>
-      <div class="code" id="code"><span class="k">var</span> out: [String] = []
-<span class="k">var</span> prevY: CGFloat?
-<span class="k">for</span> line <span class="k">in</span> lines {
-    <span class="k">let</span> row = line.sorted { $<span class="num">0</span>.x &lt; $<span class="num">1</span>.x }
-    <span class="k">guard</span> <span class="k">let</span> first = row.first <span class="k">else</span> { <span class="k">continue</span> }
-    <span class="k">if</span> <span class="k">let</span> py = prevY {                                  <span class="c">// blank lines in between</span>
-        <span class="k">let</span> blanks = Int(((py - first.y) / lineH - <span class="num">1</span>.<span class="num">4</span>).rounded(.down))
-        <span class="k">if</span> blanks &gt; <span class="num">0</span> { out.append(contentsOf: Array(repeating: &quot;&quot;, count: min(blanks, <span class="num">3</span>))) }
-    }
-    prevY = first.y
-    <span class="k">var</span> text = &quot;&quot;
-    <span class="k">for</span> p <span class="k">in</span> row {
-        <span class="k">let</span> col = Int((p.x / charW).rounded())           <span class="c">// column from the left edge</span>
-        <span class="k">if</span> col &gt; text.count {
-            text += String(repeating: &quot; &quot;, count: col - text.count)
-        } <span class="k">else</span> <span class="k">if</span> !text.isEmpty {
-            text += &quot; &quot;
-        }
-        text += p.s
-    }
-    out.append(text)
-}
-<span class="k">return</span> out.joined(separator: &quot;\n&quot;)</div>
+      <div class="screen-bar"><span class="screen-title">Pipeline · main · #4471</span></div>
+      <div class="ui" id="code">
+        <div class="ui-h"><span class="ui-t">Checks</span><span class="ui-s">5 passed · 1 failed · 2m 41s</span></div>
+        <div class="ck ok"><i></i><b>lint</b><span>eslint · 14s</span></div>
+        <div class="ck ok"><i></i><b>build</b><span>swiftc · 31s</span></div>
+        <div class="ck ok"><i></i><b>test · unit</b><span>212 passed · 48s</span></div>
+        <div class="ck bad"><i></i><b>test · integration</b><span>1 failed · 2m 14s</span></div>
+        <div class="ck ok"><i></i><b>audit</b><span>0 advisories · 6s</span></div>
+        <div class="ck ok"><i></i><b>size</b><span>+0.4 kB · 3s</span></div>
+        <div class="ui-f">Merging is blocked until every required check passes.</div>
+      </div>
       <svg id="ovl" aria-hidden="true"></svg>
       <div class="readout" id="readout"></div>
       <div class="hint" id="hint">Drag anywhere on this screen<br><span style="color:var(--faint);font-size:.82em">or focus it and press Enter</span></div>
@@ -549,7 +559,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     if(mode==='idle'){
       if(k==='enter'||k===' '){        // pointerless way into the demo
         e.preventDefault(); userTook=true;
-        sel={x:W*.08,y:H*.28,w:W*.6,h:H*.36}; mode='editing'; strokes=[];
+        sel={x:W*.03,y:H*.43,w:W*.94,h:H*.15}; mode='editing'; strokes=[];
         hint.style.opacity=0; draw(); placeBar(); syncTools();
       }
       return;
@@ -567,10 +577,10 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   // one authored moment: a ghost drag teaches the gesture, once, then hands over
   function ghost(){
     size();
-    if(reduce){ sel={x:W*.06,y:H*.30,w:W*.62,h:H*.34}; mode='editing';
-      strokes=[{tool:'rect',color:'#E5484D',pts:[[W*.10,H*.44],[W*.55,H*.53]]}];
+    if(reduce){ sel={x:W*.03,y:H*.43,w:W*.94,h:H*.15}; mode='editing';
+      strokes=[{tool:'pen',color:'#E5484D',pts:[[W*.07,H*.545],[W*.30,H*.545]]}];
       hint.style.opacity=0; draw(); placeBar(); syncTools(); return; }
-    var a=[W*.06,H*.30], b=[W*.68,H*.64], t0=null, dur=900;
+    var a=[W*.03,H*.43], b=[W*.97,H*.58], t0=null, dur=900;
     mode='selecting';
     function step(ts){
       if(userTook) return;
@@ -580,7 +590,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
       draw();
       if(k<1) requestAnimationFrame(step);
       else { mode='editing'; placeBar();
-        var p0=[W*.12,H*.46], p1=[W*.52,H*.46], s0=null;
+        var p0=[W*.07,H*.545], p1=[W*.30,H*.545], s0=null;
         function pen(ts2){ if(userTook){ cur=null; return; } if(!s0) s0=ts2;
           var kk=Math.min(1,(ts2-s0)/420), ee=1-Math.pow(1-kk,3);
           cur={tool:'pen',color:'#E5484D',pts:[p0,[p0[0]+(p1[0]-p0[0])*ee,p1[1]]]};
@@ -598,6 +608,59 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   new IntersectionObserver(function(en){
     en.forEach(function(x){ if(x.isIntersecting&&!seen){ seen=true; setTimeout(ghost,320); } });
   },{threshold:.5}).observe(screen);
+
+  // ── ambient ascii: the product's own mechanic, drawn in characters ──
+  (function(){
+    var el=document.getElementById('ascii'); if(!el) return;
+    var COLS=44, ROWS=26, RAMP=' .:-=+*#%@', t=0, raf=null, visible=false;
+
+    function frame(){
+      // two drifting fields; luminance picks the glyph, exactly like a ramp render
+      var sel={x:4+Math.sin(t*0.011)*3.4, y:5+Math.cos(t*0.009)*3.2, w:24, h:11};
+      sel.x=Math.round(sel.x); sel.y=Math.round(sel.y);
+      var rows=[];
+      for(var r=0;r<ROWS;r++){
+        var line='';
+        for(var c=0;c<COLS;c++){
+          var v=Math.sin(c*0.29+t*0.024)*Math.cos(r*0.42-t*0.017)
+               +Math.sin((c*0.13+r*0.21)+t*0.011);
+          var n=(v+2)/4;                                  // 0..1
+          line+=RAMP[Math.max(0,Math.min(RAMP.length-1,Math.round(n*(RAMP.length-1))))];
+        }
+        var inside = r>=sel.y && r<sel.y+sel.h;
+        if(!inside){ rows.push(esc(line)); continue; }
+        var a=line.slice(0,sel.x), z=line.slice(sel.x+sel.w), b;
+        if(r===sel.y||r===sel.y+sel.h-1){
+          var h=Array(sel.w-1).join('─');
+          b=(r===sel.y?'┌'+h+'┐':'└'+h+'┘');
+          rows.push(esc(a)+'<span class="edge">'+b+'</span>'+esc(z));
+        } else {
+          b=line.slice(sel.x+1,sel.x+sel.w-1);
+          rows.push(esc(a)+'<span class="edge">│</span>'+
+                    '<span class="lit">'+esc(b)+'</span>'+
+                    '<span class="edge">│</span>'+esc(z));
+        }
+      }
+      el.innerHTML=rows.join('\n');
+      t++;
+    }
+    function esc(x){ return x.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+    var last=0;
+    function loop(ts){
+      raf=requestAnimationFrame(loop);
+      if(ts-last<83) return;                              // ~12fps is plenty
+      last=ts;
+      if(!visible||document.hidden) return;
+      frame();
+    }
+    frame();
+    if(reduce) return;                                    // one still frame, no loop
+    new IntersectionObserver(function(en){
+      en.forEach(function(x){ visible=x.isIntersecting; });
+    },{threshold:0}).observe(el);
+    raf=requestAnimationFrame(loop);
+  })();
 
   // manifest - every number and every line comes from sync.py, never from hand
   var D=window.SHOTTY, CHEV='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
@@ -621,10 +684,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     document.getElementById(b.getAttribute('aria-controls')).hidden=open;
   });
 
-  // the demo screen shows the same generated excerpt
-  document.getElementById('code').innerHTML=D.excerpt.html;
-  document.querySelector('.screen-title').textContent=
-    'main.swift:'+D.excerpt.from+'–'+D.excerpt.to+' — verbatim, dedented';
+
 
   // ── live OCR reconstruction ─────────────────────────────────────────
   // Overlay.layout(_:) ported to JS. The fragments below carry synthetic noise

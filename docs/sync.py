@@ -2,7 +2,7 @@
 """Regenerate docs/source.js from main.swift.
 
 The landing page's whole argument is a line count, so nothing on it is typed by
-hand: region counts, the demo excerpt and the readable source all come from here.
+hand: region counts, the manifest ranges and the readable source all come from here.
 Run this after any change to main.swift, or the page starts lying.
 """
 import io, json, os, re, html
@@ -23,7 +23,6 @@ REGIONS = [
     ("Global hotkey",             432, 439),
     ("App and launch",            440, 459),
 ]
-EXCERPT = (356, 378)
 
 KW = {"var","let","for","in","if","else","guard","return","func","static","struct",
       "continue","nil","true","false","enum","class","final","import","case","switch",
@@ -64,8 +63,6 @@ def main():
     assert total == counted, "regions cover %d lines, file has %d" % (total, counted)
 
     data = {"total": total, "fileLines": len(src),
-            "excerpt": {"from": EXCERPT[0], "to": EXCERPT[1],
-                        "html": block(src[EXCERPT[0]-1:EXCERPT[1]])},
             "regions": regions}
 
     out = os.path.join(HERE, "source.js")

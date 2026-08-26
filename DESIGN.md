@@ -73,15 +73,26 @@ Two, and both prove a claim the page makes. Neither is decoration, and that is t
 future one has to pass.
 
 1. **The capture gesture** (hero). Drag on the page: it dims outside your box, lights inside,
-   and the toolbar appears under the selection. The screen being marked up is Shotty's own
-   source.
+   and the toolbar appears under the selection. The surface being marked up is an authored,
+   deliberately unbranded light app screen — a CI check list with one failure — because that
+   is what people actually screenshot and annotate. It is light so the 50% dim reads.
+   **Never put a real company's UI, logo or a real person there.** A marketing page for an
+   open source tool does not need someone else's trademark on it, and the demo does not get
+   more honest by borrowing one.
 2. **The OCR reconstruction** (OCR section). `Overlay.layout(_:)` ported to JS, running for
    real in the visitor's browser on fragments carrying synthetic Vision-like noise. Three
    steps: boxes, rows resolved (red bands show the grouping), columns resolved. The last step
    asserts the output equals the input and says so — **if the port is ever wrong, the page
    says so out loud instead of lying.**
 
-Both cancel their teaching animation the moment the visitor touches them. A demonstration
+Plus one ambient piece, held to the same test: the hero's ASCII field is the product's own
+mechanic drawn in characters — a selection rectangle drifting over a luminance ramp, lit
+inside, dim outside. It is the world of the "ASCII Live Render" direction the roll declined,
+kept as ambience rather than as the page's identity. It runs at 12fps, only while on screen
+and only while the tab is visible, is hidden below 1000px, and renders one still frame under
+`prefers-reduced-motion`.
+
+Both interactive pieces cancel their teaching animation the moment the visitor touches them. A demonstration
 that fights the person trying it is worse than no demonstration.
 
 ## Generated data, never typed
