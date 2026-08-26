@@ -85,6 +85,14 @@ literal line count. Voice: plain, technical, unhurried; describes the mechanism
 instead of selling it; never uses "effortless", "seamless" or "magical"; never
 attacks a named competitor, because the position does not need one.
 
+Standing visual preference, set 2026-08-27: for web surfaces the owner chose the
+**category standard** over four invented visual worlds, with the craft bar named
+as "between ponytail and Ghostty" — Ghostty-level typography and detail,
+ponytail-level restraint, nothing on the page that does not do work. Convention is
+the commitment: execute it straight, with no irony and no smuggled quirk. Do not
+re-open a direction round for a new web surface without being asked; inherit
+DESIGN.md instead.
+
 ## Evidence on Hand
 
 Real and verifiable, in order of persuasive weight: 393 lines of code / 459 total

@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shotty — a screenshot tool you can read before you run it</title>
+<meta name="description" content="An open source screenshot tool for macOS in 393 lines of Swift. Freeze the screen, select a region, draw on it before it is copied anywhere, and OCR it with the indentation intact.">
+<meta property="og:title" content="Shotty">
+<meta property="og:description" content="An open source macOS screenshot tool in 393 lines of Swift. Capture, annotate, OCR — small enough to read before you run it.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+/* self-hosted: a page whose thesis is "no network calls" does not call a font CDN */
+@font-face{font-family:"Archivo";src:url(fonts/archivo.woff2) format("woff2-variations");
+  font-weight:400 700;font-display:swap;font-style:normal}
+@font-face{font-family:"JetBrains Mono";src:url(fonts/jetbrains-mono.woff2) format("woff2-variations");
+  font-weight:400 500;font-display:swap;font-style:normal}
+:root{
+  --bg:#111110; --bg-2:#191917; --bg-3:#201F1C;
+  --line:#2B2A26; --line-2:#3A3833;
+  --text:#ECEAE4; --dim:#9B968A; --faint:#8F8A7E;
+  --mark:#E5484D;
+  --sans:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --pad:clamp(1.25rem,5vw,2.5rem);
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:var(--sans); font-size:17px; line-height:1.6;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+::selection{background:rgba(229,72,77,.3); color:#fff}
+:focus-visible{outline:2px solid var(--mark); outline-offset:3px; border-radius:2px}
+a{color:inherit; text-decoration:none}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--line-2);border:3px solid var(--bg);border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:#4A4740}
+html{scrollbar-color:var(--line-2) var(--bg)}
+
+.wrap{max-width:1120px;margin:0 auto;padding:0 var(--pad)}
+.rule{border-top:1px solid var(--line)}
+code{font-family:var(--mono);font-size:.88em;color:var(--text)}
+
+/* nav */
+nav{position:sticky;top:0;z-index:40;background:rgba(17,17,16,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
+.brand{display:flex;align-items:center;gap:.6rem;font-weight:600;letter-spacing:-.01em}
+.brand .cut{color:var(--mark);font-size:1.05rem;line-height:1}
+nav .links{display:flex;gap:1.6rem;font-size:.9rem;color:var(--dim);white-space:nowrap}
+nav .links a{transition:color .18s}
+nav .links a:hover{color:var(--text)}
+
+/* hero */
+header{padding:clamp(4rem,11vw,7.5rem) 0 clamp(2.5rem,5vw,3.5rem)}
+h1{
+  font-size:clamp(2.3rem,5.6vw,4.25rem); font-weight:700;
+  letter-spacing:-.035em; line-height:1.02; max-width:17ch; text-wrap:balance;
+}
+
+.lede{margin-top:1.5rem;max-width:62ch;font-size:clamp(1.02rem,1.6vw,1.2rem);color:var(--dim);line-height:1.62}
+.lede strong{color:var(--text);font-weight:500}
+
+.cta{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:2.25rem;align-items:center}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.6rem;min-height:44px;padding:.55rem 1.1rem;
+  border-radius:7px;font-size:.94rem;font-weight:500;border:1px solid transparent;
+  cursor:pointer;font-family:var(--mono);transition:background .18s,border-color .18s,color .18s;
+}
+.btn-primary{background:var(--text);color:#111110;border-color:var(--text)}
+.btn-primary:hover{background:#fff;border-color:#fff}
+.btn-ghost{color:var(--dim);border-color:#6B665C;background:transparent}
+.btn-ghost:hover{color:var(--text);border-color:var(--dim)}
+.btn svg{width:15px;height:15px;flex:none}
+.btn span{white-space:nowrap}
+@media (max-width:430px){.btn{width:100%}#clone-label{font-size:.8rem}}
+
+/* proof terminal */
+.proof{margin-top:2.75rem;border:1px solid var(--line);border-radius:9px;background:var(--bg);overflow:hidden;max-width:62ch}
+.proof-head{color:var(--faint);display:flex;align-items:center;gap:.55rem;padding:.6rem .9rem;border-bottom:1px solid var(--line);color:var(--faint);font-size:.76rem;font-family:var(--mono);letter-spacing:.02em}
+.proof-body{padding:1rem .9rem 1.1rem;font-family:var(--mono);font-size:.82rem;line-height:1.85;overflow-x:auto;white-space:pre}
+.proof-body .p{color:var(--faint);user-select:none}
+.proof-body .c{color:var(--text)}
+.proof-body .o{color:var(--dim)}
+.proof-body .n{color:var(--mark)}
+.proof-note{margin-top:.9rem;font-size:.84rem;color:var(--faint);max-width:60ch}
+
+/* section shell */
+section{padding:clamp(3.5rem,8vw,6rem) 0}
+h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;line-height:1.15;max-width:26ch;text-wrap:balance}
+.sub{margin-top:.9rem;max-width:66ch;color:var(--dim);font-size:1rem;line-height:1.65}
+
+/* demo */
+#demo-sec{padding-top:0}
+.screen:focus-visible{outline:2px solid var(--mark);outline-offset:3px}
+.screen{
+  position:relative;margin-top:1.75rem;border:1px solid var(--line-2);border-radius:11px;
+  background:#0B0B0A;overflow:hidden;box-shadow:0 24px 60px -20px rgba(0,0,0,.75);
+  touch-action:none;user-select:none;cursor:crosshair;
+}
+.screen-bar{display:flex;align-items:center;gap:.5rem;height:36px;padding:0 .85rem;background:var(--bg-3);border-bottom:1px solid var(--line)}
+.dot{width:11px;height:11px;border-radius:50%;background:#3A3833}
+
+.screen-title{font-family:var(--mono);font-size:.74rem;color:var(--faint)}
+.code{padding:1.15rem 1.25rem;font-family:var(--mono);font-size:clamp(.66rem,1.15vw,.79rem);line-height:1.75;white-space:pre;overflow:hidden;color:#B9B4A8}
+.code .k{color:#C58AF0}.code .s{color:#8FBF7F}.code .c{color:#8A8579}.code .f{color:#7FB2E5}.code .num{color:#E0A458}
+#ovl{position:absolute;inset:36px 0 0 0;pointer-events:none}
+.readout{
+  position:absolute;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.7rem;padding:.2rem .45rem;border-radius:3px;
+  background:rgba(11,11,10,.9);color:var(--text);pointer-events:none;opacity:0;letter-spacing:.02em;
+}
+.hint{
+  position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);pointer-events:none;
+  font-size:.9rem;color:var(--dim);background:rgba(11,11,10,.82);padding:.5rem .9rem;border-radius:6px;
+  border:1px solid var(--line-2);transition:opacity .4s var(--ease)
+}
+.bar{
+  position:absolute;display:none;align-items:center;gap:.15rem;padding:.3rem;border-radius:7px;
+  background:rgba(14,14,13,.94);border:1px solid var(--line-2);backdrop-filter:blur(8px);z-index:3;
+  box-shadow:0 10px 26px -8px rgba(0,0,0,.8)
+}
+.bar.on{display:flex}
+.tool{width:30px;height:28px;border:0;background:transparent;border-radius:5px;color:var(--dim);cursor:pointer;display:grid;place-items:center;transition:background .15s,color .15s}
+.tool:hover:not(:disabled){background:#242320;color:var(--text)}
+.tool:disabled{opacity:.35;cursor:default}
+.tool[aria-pressed=true]{background:#302E29;color:var(--text)}
+.tool svg{width:15px;height:15px}
+.sep{width:1px;height:17px;background:var(--line-2);margin:0 .3rem}
+.swatch{width:17px;height:17px;border-radius:50%;border:1.5px solid transparent;cursor:pointer;padding:0;margin:0 1px;transition:transform .15s var(--ease)}
+.swatch:hover{transform:scale(1.15)}
+.swatch[aria-pressed=true]{border-color:var(--text)}
+.demo-note{margin-top:1rem;font-size:.86rem;color:var(--faint);max-width:68ch}
+.demo-note kbd{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI Symbol",var(--mono);font-size:.82em;color:var(--dim);border:1px solid var(--line-2);border-radius:4px;padding:.05em .35em}
+
+/* manifest */
+.manifest{margin-top:2rem;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 62px;align-items:center;gap:1.5rem;padding:.72rem 0;border-bottom:1px solid var(--line);transition:background .15s}
+.row:hover{background:#161514}
+.row .nm{font-size:.95rem}
+.row .ct{font-family:var(--mono);font-size:.88rem;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
+.row.total{border-bottom:0;padding-top:1.05rem}
+.row.total .nm{font-weight:600}
+.row.total .ct{color:var(--mark);font-weight:500}
+
+/* two-col */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.5rem,4vw,3.5rem);margin-top:2rem;align-items:start}
+.panel{border:1px solid var(--line);border-radius:9px;background:var(--bg-2);overflow:hidden}
+.panel-head{display:flex;justify-content:space-between;gap:1rem;padding:.6rem .9rem;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.74rem;color:var(--faint);letter-spacing:.02em}
+.panel.shot{border-color:var(--line-2)}
+.panel.shot .panel-body{background:#0B0B0A;box-shadow:inset 0 0 0 1px rgba(236,234,228,.14);user-select:none}
+.panel-head b{font-weight:400;color:var(--dim);font-variant-numeric:tabular-nums}
+.panel-body{padding:1rem .95rem;font-family:var(--mono);font-size:.78rem;line-height:1.8;white-space:pre;overflow-x:auto;color:#B9B4A8}
+
+/* keys */
+.keys{width:100%;border-collapse:collapse;margin-top:1.5rem}
+.keys td{padding:.6rem 0;border-bottom:1px solid var(--line);font-size:.95rem;vertical-align:top}
+.keys td:first-child{width:130px;white-space:nowrap}
+.keys td:last-child{color:var(--dim)}
+kbd{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI Symbol",var(--mono);font-size:.8rem;background:var(--bg-3);border:1px solid var(--line-2);
+  border-bottom-width:2px;border-radius:5px;padding:.15em .45em;color:var(--text);white-space:nowrap
+}
+ol.steps{list-style:none;counter-reset:s;margin-top:1.5rem}
+ol.steps li{counter-increment:s;padding:0 0 1.35rem 2.1rem;position:relative;color:var(--dim);font-size:.95rem;line-height:1.6}
+ol.steps li::before{
+  content:counter(s);position:absolute;left:0;top:.05rem;width:1.4rem;height:1.4rem;border-radius:50%;
+  border:1px solid var(--line-2);display:grid;place-items:center;font-family:var(--mono);font-size:.72rem;color:var(--faint)
+}
+ol.steps b{color:var(--text);font-weight:500}
+.cmd{
+  display:block;margin-top:.55rem;font-family:var(--mono);font-size:.8rem;color:var(--text);
+  background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:.6rem .75rem;overflow-x:auto;white-space:pre
+}
+
+footer{border-top:1px solid var(--line);padding:3rem 0 4rem;color:var(--faint);font-size:.9rem}
+footer .cols2{display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:start}
+footer p{max-width:58ch;line-height:1.65}
+footer a{color:var(--dim);border-bottom:1px solid var(--line-2);transition:color .18s,border-color .18s}
+footer a:hover{color:var(--text);border-color:var(--dim)}
+.foot-links{display:flex;flex-direction:column;gap:.5rem;text-align:right}
+
+@media (max-width:760px){
+  .cols,footer .cols2{grid-template-columns:1fr}
+  .foot-links{text-align:left;flex-direction:row;gap:1.25rem;flex-wrap:wrap}
+  nav .links{gap:1.15rem;font-size:.84rem}
+  nav .links a[data-hide]{display:none}
+  .row{grid-template-columns:minmax(0,1fr) 56px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<!--
+THESIS: A screenshot utility sold on a number anyone can verify in one shell command, not on
+a feature list. Refuses the category's icon-card feature grid; the proof sections are the page.
+OWN-WORLD: Warm near-black ground, single warm off-white text, one reserved mark-red used only
+where a human made a mark. Archivo + JetBrains Mono, hairline rules instead of cards, no
+gradients, no glass as decoration.
+STORY: This is small enough to audit; here is the gesture, here is every line accounted for,
+here is how to build it.
+FIRST VIEWPORT: Headline at 4.25rem left-aligned, lede, two actions, and a real terminal block
+showing wc/grep output. The interactive screen sits immediately under it, full width.
+FORM: The category standard, taken as the standing exit and executed straight, calibrated
+between ponytail restraint and Ghostty craft. Seed 25e070f3.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the
+verdict, DESIGN.md, and every shipping raster
+-->
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="cut">✂︎</span> Shotty</a>
+    <div class="links">
+      <a href="#how" data-hide>How it works</a>
+      <a href="#lines">393 lines</a>
+      <a href="#ocr" data-hide>OCR</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/uuu4/shotty">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<header id="top">
+  <div class="wrap">
+    <h1>A screenshot tool you can read before you run it.</h1>
+    <p class="lede">Shotty freezes the screen, dims it, and lets you draw on the region you selected — <strong>before anything reaches your clipboard or your disk</strong>. It also OCRs that region with the indentation intact. It is one Swift file, 393 lines, no dependencies, and it never talks to a server.</p>
+
+    <div class="cta">
+      <button class="btn btn-primary" id="copy-clone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span id="clone-label">git clone github.com/uuu4/shotty</span>
+      </button>
+      <a class="btn btn-ghost" href="https://github.com/uuu4/shotty/blob/main/main.swift">Read main.swift</a>
+    </div>
+
+    <div class="proof">
+      <div class="proof-head">verify it yourself</div>
+      <div class="proof-body"><span class="p">$ </span><span class="c">wc -l main.swift</span>
+<span class="o">     459 main.swift</span>
+<span class="p">$ </span><span class="c">grep -vc '^[[:space:]]*$\|^[[:space:]]*//' main.swift</span>
+<span class="n">393</span><span class="o">   # lines that are actually code</span>
+<span class="p">$ </span><span class="c">grep -c 'URLSession\|http' main.swift</span>
+<span class="n">0</span><span class="o">     # there is no network code</span></div>
+    </div>
+    <p class="proof-note">Those three commands are the entire pitch. Run them before you run anything else.</p>
+  </div>
+</header>
+
+<section id="how" class="rule" style="padding-bottom:0">
+  <div class="wrap">
+    <h2>The gesture, on this page</h2>
+    <p class="sub">Press the hotkey and the screen freezes and dims. Drag a box. Your selection stays lit, and you draw on it there. Nothing has been copied or saved yet, and nothing will be until you say so. Try it below: this is the same interaction, and the screen you are marking up is Shotty's own source.</p>
+  </div>
+</section>
+
+<section id="demo-sec">
+  <div class="wrap">
+    <div class="screen" id="screen" tabindex="0" role="application" aria-label="Interactive demo of the capture gesture">
+      <div class="screen-bar"><span class="screen-title">main.swift:356–378 &mdash; verbatim, dedented</span></div>
+      <div class="code" id="code"><span class="k">var</span> out: [String] = []
+<span class="k">var</span> prevY: CGFloat?
+<span class="k">for</span> line <span class="k">in</span> lines {
+    <span class="k">let</span> row = line.sorted { $<span class="num">0</span>.x &lt; $<span class="num">1</span>.x }
+    <span class="k">guard</span> <span class="k">let</span> first = row.first <span class="k">else</span> { <span class="k">continue</span> }
+    <span class="k">if</span> <span class="k">let</span> py = prevY {                                  <span class="c">// blank lines in between</span>
+        <span class="k">let</span> blanks = Int(((py - first.y) / lineH - <span class="num">1</span>.<span class="num">4</span>).rounded(.down))
+        <span class="k">if</span> blanks &gt; <span class="num">0</span> { out.append(contentsOf: Array(repeating: &quot;&quot;, count: min(blanks, <span class="num">3</span>))) }
+    }
+    prevY = first.y
+    <span class="k">var</span> text = &quot;&quot;
+    <span class="k">for</span> p <span class="k">in</span> row {
+        <span class="k">let</span> col = Int((p.x / charW).rounded())           <span class="c">// column from the left edge</span>
+        <span class="k">if</span> col &gt; text.count {
+            text += String(repeating: &quot; &quot;, count: col - text.count)
+        } <span class="k">else</span> <span class="k">if</span> !text.isEmpty {
+            text += &quot; &quot;
+        }
+        text += p.s
+    }
+    out.append(text)
+}
+<span class="k">return</span> out.joined(separator: &quot;\n&quot;)</div>
+      <svg id="ovl" aria-hidden="true"></svg>
+      <div class="readout" id="readout"></div>
+      <div class="hint" id="hint">Drag anywhere on this screen<br><span style="color:var(--faint);font-size:.82em">or focus it and press Enter</span></div>
+      <div class="bar" id="bar" role="toolbar" aria-label="Annotation tools">
+        <button class="tool" data-tool="pen" aria-pressed="true" title="Pen (P)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/></svg></button>
+        <button class="tool" data-tool="rect" aria-pressed="false" title="Rectangle (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/></svg></button>
+        <button class="tool" data-tool="arrow" aria-pressed="false" title="Arrow (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19L19 5"/><path d="M11 5h8v8"/></svg></button>
+        <button class="tool" data-tool="highlight" aria-pressed="false" title="Highlighter (H)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16"/><path d="M7 14l8-8 4 4-8 8H7v-4z"/></svg></button>
+        <i class="sep"></i>
+        <button class="swatch" data-color="#E5484D" aria-pressed="true" style="background:#E5484D" title="Red"></button>
+        <button class="swatch" data-color="#F5C518" aria-pressed="false" style="background:#F5C518" title="Yellow"></button>
+        <button class="swatch" data-color="#4C9AFF" aria-pressed="false" style="background:#4C9AFF" title="Blue"></button>
+        <button class="swatch" data-color="#4CC38A" aria-pressed="false" style="background:#4CC38A" title="Green"></button>
+        <button class="swatch" data-color="#ECEAE4" aria-pressed="false" style="background:#ECEAE4" title="White"></button>
+        <i class="sep"></i>
+        <button class="tool" id="undo" title="Undo (⌘Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.1-5.6L3 10"/></svg></button>
+        <button class="tool" id="reset" title="Start over (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+    </div>
+    <p class="demo-note">In the app the same toolbar carries Copy, Save and OCR, and the keys are <kbd>P</kbd> <kbd>R</kbd> <kbd>A</kbd> <kbd>H</kbd> for the tools, <kbd>⌘C</kbd> to copy the lit region, <kbd>⌘R</kbd> to read its text. Drag outside your selection to start a new one.</p>
+  </div>
+</section>
+
+<section id="lines" class="rule">
+  <div class="wrap">
+    <h2>Every line, accounted for</h2>
+    <p class="sub">This is the whole program. Not the interesting parts of it, not a summary. All of it, grouped by what each region does. If it ever reaches four digits, the argument on this page stops being true and you should hold me to that.</p>
+    <div class="manifest" id="manifest"></div>
+  </div>
+</section>
+
+<section id="ocr" class="rule">
+  <div class="wrap">
+    <h2>OCR that keeps the columns</h2>
+    <p class="sub">Vision returns recognized text as a bag of bounding boxes, so the straightforward implementation pastes back a flattened blob. Shotty estimates character width from the median box, maps every fragment back to a column, and reprints the block, so indentation, column gaps and paragraph breaks survive and a screenshot of code comes back as code. The whole OCR path is 80 lines; the column reconstruction itself is <code>Overlay.layout(_:)</code>, 44 of them.</p>
+    <div class="cols">
+      <div class="panel shot">
+        <div class="panel-head">the lit selection<b>412 × 196</b></div>
+        <div class="panel-body">func schedule(_ items: [Item]) {
+    for item in items {
+        guard item.isReady else {
+            log.warn("skipping \(item.id)")
+            continue
+        }
+        queue.append(item)
+    }
+}</div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">⌘R → your clipboard<b>selectable text</b></div>
+        <div class="panel-body">func schedule(_ items: [Item]) {
+    for item in items {
+        guard item.isReady else {
+            log.warn("skipping \(item.id)")
+            continue
+        }
+        queue.append(item)
+    }
+}</div>
+      </div>
+    </div>
+    <p class="demo-note" style="margin-top:1.1rem"><span style="color:var(--dim)">Character for character, column for column: that identity is the entire feature.</span> Try to select the left panel and you cannot, because it stands for pixels; the right one is real text. Small selections are upscaled 2× before recognition, and language correction is off by default so it stops "fixing" your identifiers. One flag at the top of the file turns it back on if you mostly capture prose.</p>
+  </div>
+</section>
+
+<section id="install" class="rule">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h2>Install</h2>
+        <p class="sub">There is no signed installer yet. You build it, which takes a few seconds and means you can read what you are running first.</p>
+        <ol class="steps">
+          <li><b>Get the command line tools</b> if you don't have them.<code class="cmd">xcode-select --install</code></li>
+          <li><b>Clone and build.</b> <code>build.sh</code> is 22 lines: swiftc plus an Info.plist.<code class="cmd">git clone https://github.com/uuu4/shotty.git
+cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
+          <li><b>Grant Screen Recording</b> on the first capture: System Settings → Privacy &amp; Security → Screen Recording. Then open it once more. Shotty lives in the menu bar as ✂︎, with no Dock icon. macOS 13 or later.</li>
+        </ol>
+      </div>
+      <div>
+        <h2>Keys</h2>
+        <table class="keys">
+          <tr><td><kbd>⌘⇧2</kbd></td><td>capture</td></tr>
+          <tr><td>drag</td><td>select a region; drag outside it to reselect</td></tr>
+          <tr><td><kbd>P</kbd> <kbd>R</kbd> <kbd>A</kbd> <kbd>H</kbd></td><td>pen · rectangle · arrow · highlighter</td></tr>
+          <tr><td><kbd>⌘Z</kbd></td><td>undo the last stroke</td></tr>
+          <tr><td><kbd>⌘C</kbd> <kbd>Return</kbd></td><td>copy the selection to the clipboard</td></tr>
+          <tr><td><kbd>⌘S</kbd></td><td>save it to the Desktop</td></tr>
+          <tr><td><kbd>⌘R</kbd></td><td>OCR the selection to the clipboard</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>cancel</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap cols2">
+    <p><b style="color:var(--dim);font-weight:500">Not doing:</b> a text tool, resize handles, upload links, history, cloud sync, an updater, analytics. Each one costs lines, and the line count is the argument. MIT licensed. Fork it, change the keybinding, ship your own.</p>
+    <div class="foot-links">
+      <a href="https://github.com/uuu4/shotty">Repository</a>
+      <a href="https://github.com/uuu4/shotty/blob/main/main.swift">main.swift</a>
+      <a href="https://github.com/uuu4/shotty/blob/main/LICENSE">MIT License</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  var screen=document.getElementById('screen'), ovl=document.getElementById('ovl'),
+      bar=document.getElementById('bar'), hint=document.getElementById('hint'),
+      readout=document.getElementById('readout');
+  var W=0,H=0,mode='idle',sel=null,start=null,tool='pen',color='#E5484D',strokes=[],cur=null,userTook=false;
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function size(){ var r=ovl.getBoundingClientRect(); W=r.width; H=r.height;
+    ovl.setAttribute('viewBox','0 0 '+W+' '+H); ovl.setAttribute('width',W); ovl.setAttribute('height',H); }
+  function el(n,a){ var e=document.createElementNS(NS,n); for(var k in a) e.setAttribute(k,a[k]); return e; }
+
+  function draw(){
+    while(ovl.firstChild) ovl.removeChild(ovl.firstChild);
+    if(!sel){ readout.style.opacity=0; return; }
+    var d=el('defs'), m=el('mask',{id:'hole'});
+    m.appendChild(el('rect',{x:0,y:0,width:W,height:H,fill:'#fff'}));
+    m.appendChild(el('rect',{x:sel.x,y:sel.y,width:sel.w,height:sel.h,fill:'#000'}));
+    d.appendChild(m); ovl.appendChild(d);
+    ovl.appendChild(el('rect',{x:0,y:0,width:W,height:H,fill:'#000','fill-opacity':.5,mask:'url(#hole)'}));
+    ovl.appendChild(el('rect',{x:sel.x+.5,y:sel.y+.5,width:Math.max(0,sel.w-1),height:Math.max(0,sel.h-1),
+      fill:'none',stroke:'#fff','stroke-width':1,'stroke-opacity':.9}));
+
+    var clip=el('clipPath',{id:'sc'});
+    clip.appendChild(el('rect',{x:sel.x,y:sel.y,width:sel.w,height:sel.h}));
+    ovl.appendChild(clip);
+    var g=el('g',{'clip-path':'url(#sc)'});
+    strokes.concat(cur?[cur]:[]).forEach(function(s){ g.appendChild(shape(s)); });
+    ovl.appendChild(g);
+
+    readout.style.opacity=1;
+    readout.textContent=Math.round(sel.w*2)+' × '+Math.round(sel.h*2);
+    readout.style.left=sel.x+'px';
+    readout.style.top=(sel.y>26? sel.y+36-24 : sel.y+36+sel.h+6)+'px';
+  }
+
+  function shape(s){
+    var p=s.pts, w=s.tool==='highlight'?16:3, o=s.tool==='highlight'?.3:1, d='';
+    if(p.length<2) return el('g');
+    if(s.tool==='pen'||s.tool==='highlight'){
+      d='M'+p.map(function(q){return q[0]+' '+q[1];}).join('L');
+    } else if(s.tool==='rect'){
+      var x=Math.min(p[0][0],p[1][0]),y=Math.min(p[0][1],p[1][1]),
+          ww=Math.abs(p[1][0]-p[0][0]),hh=Math.abs(p[1][1]-p[0][1]);
+      d='M'+x+' '+y+'h'+ww+'v'+hh+'h'+(-ww)+'Z';
+    } else {
+      var a=p[0],b=p[1],ang=Math.atan2(b[1]-a[1],b[0]-a[0]),L=14;
+      d='M'+a[0]+' '+a[1]+'L'+b[0]+' '+b[1];
+      [Math.PI*.85,-Math.PI*.85].forEach(function(t){
+        d+='M'+b[0]+' '+b[1]+'L'+(b[0]+Math.cos(ang+t)*L)+' '+(b[1]+Math.sin(ang+t)*L);
+      });
+    }
+    return el('path',{d:d,fill:'none',stroke:s.color,'stroke-width':w,'stroke-opacity':o,
+      'stroke-linecap':'round','stroke-linejoin':'round'});
+  }
+
+  function placeBar(){
+    if(!sel){ bar.classList.remove('on'); return; }
+    bar.classList.add('on');
+    var bw=bar.offsetWidth, bh=bar.offsetHeight, top=36;
+    var y=sel.y+top+sel.h+8;
+    if(y+bh>H+top-6) y=Math.max(top+6,sel.y+top-bh-8);
+    bar.style.left=Math.min(Math.max(6,sel.x+sel.w-bw),W-bw-6)+'px';
+    bar.style.top=y+'px';
+  }
+
+  function pt(e){ var r=ovl.getBoundingClientRect();
+    return [Math.max(0,Math.min(W,e.clientX-r.left)),Math.max(0,Math.min(H,e.clientY-r.top))]; }
+
+  screen.addEventListener('pointerdown',function(e){
+    if(e.target.closest('#bar')) return;
+    userTook=true;                 // stops the teaching animation mid-flight
+    screen.setPointerCapture(e.pointerId);
+    hint.style.opacity=0;
+    var p=pt(e);
+    if(mode==='editing'&&sel&&p[0]>=sel.x&&p[0]<=sel.x+sel.w&&p[1]>=sel.y&&p[1]<=sel.y+sel.h){
+      cur={tool:tool,color:color,pts:[p]};
+    } else {
+      mode='selecting'; start=p; sel={x:p[0],y:p[1],w:0,h:0}; strokes=[]; cur=null;
+      bar.classList.remove('on');
+    }
+    draw();
+  });
+
+  screen.addEventListener('pointermove',function(e){
+    if(mode==='idle') return;
+    var p=pt(e);
+    if(mode==='selecting'&&start){
+      sel={x:Math.min(start[0],p[0]),y:Math.min(start[1],p[1]),
+           w:Math.abs(p[0]-start[0]),h:Math.abs(p[1]-start[1])};
+    } else if(cur){
+      if(cur.tool==='pen'||cur.tool==='highlight') cur.pts.push(p); else cur.pts=[cur.pts[0],p];
+    } else return;
+    draw();
+  });
+
+  screen.addEventListener('pointerup',function(e){
+    if(mode==='selecting'){
+      if(!sel||sel.w<12||sel.h<12){ sel=null; mode='idle'; hint.style.opacity=1; draw(); return; }
+      mode='editing'; placeBar();
+    } else if(cur){
+      if(cur.pts.length>=2) strokes.push(cur);
+      cur=null; syncTools();
+    }
+    start=null; draw();
+  });
+
+  function syncTools(){
+    bar.querySelectorAll('[data-tool]').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.tool===tool);});
+    bar.querySelectorAll('[data-color]').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.color===color);});
+    document.getElementById('undo').disabled = strokes.length===0;
+  }
+
+  bar.addEventListener('click',function(e){
+    var t=e.target.closest('[data-tool]'), c=e.target.closest('[data-color]');
+    if(t) tool=t.dataset.tool;
+    if(c) color=c.dataset.color;
+    if(e.target.closest('#undo')){ strokes.pop(); draw(); }
+    syncTools();
+    if(e.target.closest('#reset')){ sel=null;strokes=[];cur=null;mode='idle';
+      bar.classList.remove('on');hint.style.opacity=1;draw(); }
+  });
+
+  screen.addEventListener('keydown',function(e){
+    var k=e.key.toLowerCase(), map={p:'pen',r:'rect',a:'arrow',h:'highlight'};
+    if(mode==='idle'){
+      if(k==='enter'||k===' '){        // pointerless way into the demo
+        e.preventDefault(); userTook=true;
+        sel={x:W*.08,y:H*.28,w:W*.6,h:H*.36}; mode='editing'; strokes=[];
+        hint.style.opacity=0; draw(); placeBar(); syncTools();
+      }
+      return;
+    }
+    if(map[k]){ tool=map[k]; syncTools(); }
+    if(k==='escape'){ sel=null;strokes=[];mode='idle';bar.classList.remove('on');hint.style.opacity=1;draw(); }
+    if((e.metaKey||e.ctrlKey)&&k==='z'){ e.preventDefault(); strokes.pop(); draw(); syncTools(); }
+  });
+
+  addEventListener('resize',function(){ size(); if(sel){ sel=null;strokes=[];mode='idle';
+    bar.classList.remove('on');hint.style.opacity=1; } draw(); });
+  size(); draw();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ size(); draw(); });
+
+  // one authored moment: a ghost drag teaches the gesture, once, then hands over
+  function ghost(){
+    size();
+    if(reduce){ sel={x:W*.06,y:H*.30,w:W*.62,h:H*.34}; mode='editing';
+      strokes=[{tool:'rect',color:'#E5484D',pts:[[W*.10,H*.44],[W*.55,H*.53]]}];
+      hint.style.opacity=0; draw(); placeBar(); syncTools(); return; }
+    var a=[W*.06,H*.30], b=[W*.68,H*.64], t0=null, dur=900;
+    mode='selecting';
+    function step(ts){
+      if(userTook) return;
+      if(!t0) t0=ts;
+      var k=Math.min(1,(ts-t0)/dur), e=1-Math.pow(1-k,4);
+      sel={x:a[0],y:a[1],w:(b[0]-a[0])*e,h:(b[1]-a[1])*e};
+      draw();
+      if(k<1) requestAnimationFrame(step);
+      else { mode='editing'; placeBar();
+        var p0=[W*.12,H*.46], p1=[W*.52,H*.46], s0=null;
+        function pen(ts2){ if(userTook){ cur=null; return; } if(!s0) s0=ts2;
+          var kk=Math.min(1,(ts2-s0)/420), ee=1-Math.pow(1-kk,3);
+          cur={tool:'pen',color:'#E5484D',pts:[p0,[p0[0]+(p1[0]-p0[0])*ee,p1[1]]]};
+          draw();
+          if(kk<1) requestAnimationFrame(pen);
+          else { strokes.push(cur); cur=null; draw(); }
+        }
+        setTimeout(function(){ requestAnimationFrame(pen); },160);
+      }
+    }
+    hint.style.opacity=0;
+    requestAnimationFrame(step);
+  }
+  var seen=false;
+  new IntersectionObserver(function(en){
+    en.forEach(function(x){ if(x.isIntersecting&&!seen){ seen=true; setTimeout(ghost,320); } });
+  },{threshold:.5}).observe(screen);
+
+  // manifest
+  var M=[["Imports and settings",11],["Overlay state and init",23],["Drawing the overlay",74],
+    ["Mouse: select and annotate",43],["Keyboard",22],["Toolbar",52],["Export: copy and save",22],
+    ["OCR",80],["Window and capture",40],["Global hotkey",7],["App and launch",19]];
+  var out='';
+  M.forEach(function(r){
+    out+='<div class="row"><div class="nm">'+r[0]+'</div><div class="ct">'+r[1]+'</div></div>';
+  });
+  out+='<div class="row total"><div class="nm">main.swift</div><div class="ct">393</div></div>';
+  document.getElementById('manifest').innerHTML=out;
+
+  // copy
+  var btn=document.getElementById('copy-clone'), lbl=document.getElementById('clone-label');
+  btn.addEventListener('click',function(){
+    var LABEL='git clone github.com/uuu4/shotty';   // never read back from the DOM
+    function restore(){ setTimeout(function(){ lbl.textContent=LABEL; },1900); }
+    if(!navigator.clipboard){ lbl.textContent='clipboard blocked — copy it from Install below'; return restore(); }
+    navigator.clipboard.writeText('git clone https://github.com/uuu4/shotty.git')
+      .then(function(){ lbl.textContent='copied to clipboard'; restore(); })
+      .catch(function(){ lbl.textContent='clipboard blocked — copy it from Install below'; restore(); });
+  });
+})();
+</script>
+</body>
+</html>

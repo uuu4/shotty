@@ -1,0 +1,90 @@
+# Design
+
+Visual authority for Shotty's web surfaces. PRODUCT.md owns product truth; this file owns
+durable visual decisions. Surface: `docs/index.html`, mode **Persuade**.
+
+## The world
+
+The category standard, taken deliberately and executed straight. The owner chose the
+conventional macOS indie-utility page over four invented worlds, so convention is the
+commitment: no irony, no smuggled quirk, no half-measure toward a concept that was
+declined. Craft bar, in the owner's words: **between ponytail and Ghostty** — Ghostty-level
+typography and detail, ponytail-level restraint. Nothing exists on the page unless it does
+work.
+
+The one idea the surface owns: a utility sold on a number anyone can verify in one shell
+command, not on a feature list. The proof sections *are* the page.
+
+## Color
+
+Committed dark. The use scene decides it: a developer at their own Mac, often at night,
+deciding whether to install something.
+
+| Token | Value | Role |
+|---|---|---|
+| `--bg` | `#111110` | ground, warm near-black, never blue-black |
+| `--bg-2` | `#191917` | raised panels, terminal blocks |
+| `--bg-3` | `#201F1C` | window chrome, key caps |
+| `--line` | `#2B2A26` | hairline rules; the page separates with rules, not cards |
+| `--line-2` | `#3A3833` | stronger borders, data bars |
+| `--text` | `#ECEAE4` | warm off-white |
+| `--dim` | `#9B968A` | secondary text, tinted from the ground's hue, never gray |
+| `--faint` | `#8A857A` | tertiary text; floor is 4.5:1, do not darken it |
+| `--ghost` | `#5F5B53` | non-text labels only (panel heads); never body copy |
+| `--mark` | `#E5484D` | **reserved** |
+
+`--mark` is the app's own annotation red and carries one meaning: *a human made this mark*.
+It is spent on the word "before" in the headline, the verified numbers in the terminal, the
+393 total, and the default pen color in the demo. Nothing else may use it. A red CTA would
+spend the reservation and is forbidden.
+
+No gradients. No glass as decoration. No gradient text.
+
+## Type
+
+- **Archivo** (400/500/600/700) — everything structural. Display sits at
+  `clamp(2.3rem, 5.6vw, 4.25rem)`, weight 700, tracking `-.035em`, `text-wrap: balance` on
+  headings.
+- **JetBrains Mono** (400/500) — code, terminal output, commands, counts. Mono here is data
+  and measurement, never a costume for "technical".
+- `kbd` uses the system face first (`-apple-system`), because JetBrains Mono has no U+21E7
+  and renders ⌘⇧2 wrong.
+- Body measure stays 58–66ch. Numeric columns use `font-variant-numeric: tabular-nums`.
+
+## Components
+
+Rules over cards. There is no icon-card feature grid and there will not be one; it is the
+category's laziest container and the proof sections replace it.
+
+- **Terminal block** — bordered panel, muted head, `white-space: pre`. Prompts in
+  `--ghost`, commands in `--text`, verified numbers in `--mark`, comments in `--dim`.
+- **Manifest row** — three columns: name, a shared 150px bar track, a tabular count. The
+  shared track is what makes it read as data instead of stray dashes.
+- **Panels** — `.panel` for text, `.panel.shot` for anything representing a captured screen
+  (darker ground `#0B0B0A`, inset 1px light rule standing in for the lit selection, size
+  readout in the head).
+- **Icons** — authored SVG, 24-box, 1.8 stroke, round caps and joins. No emoji, no unicode
+  glyphs standing in for icons. The one exception is the ✂ wordmark, which is the app's own
+  menu bar symbol.
+
+## Motion
+
+One authored moment, and only one: on first scroll into the demo, a ghost cursor performs a
+single drag-select and draws one stroke, then hands control to the visitor. Exponential
+ease-out (`1 - (1-k)^4`). Under `prefers-reduced-motion` it renders the end state directly
+and animates nothing. Everything else is a 150–180ms color or border transition on hover.
+No scroll-triggered section entrances.
+
+## Browser surfaces
+
+Themed, not defaulted: `::selection` in tinted mark red, `:focus-visible` as a 2px mark ring
+at 3px offset, scrollbars in `--line-2` on the ground with a 3px inset. These are cheap and
+they are the difference between built and assembled.
+
+## Rules that outlive this page
+
+1. Any claim on any surface must be verifiable by a command the visitor can run. If the
+   line count changes, the page changes the same day.
+2. Never state what a competitor's tool fails to do. State what Shotty does.
+3. `--mark` stays reserved for human marks.
+4. New sections earn their place or do not ship. The craft bar is restraint.
