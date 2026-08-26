@@ -21,7 +21,7 @@ you just froze, before anything is written anywhere.
 Requires macOS 13+ and the Xcode command line tools (`xcode-select --install`).
 
 ```bash
-git clone https://github.com/USER/shotty.git
+git clone https://github.com/uuu4/shotty.git
 cd shotty && ./build.sh && open Shotty.app
 ```
 
