@@ -137,13 +137,21 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
 
 /* manifest */
 .manifest{margin-top:2rem;border-top:1px solid var(--line)}
-.row{display:grid;grid-template-columns:minmax(0,1fr) 62px;align-items:center;gap:1.5rem;padding:.72rem 0;border-bottom:1px solid var(--line);transition:background .15s}
-.row:hover{background:#161514}
+.row{display:grid;grid-template-columns:18px minmax(0,1fr) 96px 62px;align-items:center;gap:1rem;
+  width:100%;padding:.72rem .5rem .72rem 0;border:0;border-bottom:1px solid var(--line);
+  background:transparent;color:var(--text);font:inherit;text-align:left;cursor:pointer;transition:background .15s}
+.row:hover{background:#171615}
+.row .chev{width:13px;height:13px;color:var(--faint);transition:transform .2s var(--ease)}
+.row[aria-expanded=true] .chev{transform:rotate(90deg);color:var(--dim)}
+.row[aria-expanded=true]{background:#171615}
 .row .nm{font-size:.95rem}
+.row .rg{font-family:var(--mono);font-size:.78rem;color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
 .row .ct{font-family:var(--mono);font-size:.88rem;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
-.row.total{border-bottom:0;padding-top:1.05rem}
-.row.total .nm{font-weight:600}
-.row.total .ct{color:var(--mark);font-weight:500}
+.src{border-bottom:1px solid var(--line);background:#0D0D0C;overflow-x:auto}
+.src pre{margin:0;padding:1rem 1.1rem;font-family:var(--mono);font-size:.74rem;line-height:1.75;color:#B9B4A8}
+.total-row{display:grid;grid-template-columns:18px minmax(0,1fr) 96px 62px;align-items:center;gap:1rem;padding:1.05rem .5rem 0 0}
+.total-row .nm{font-weight:600}
+.total-row .ct{font-family:var(--mono);font-size:.88rem;color:var(--mark);font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
 
 /* two-col */
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.5rem,4vw,3.5rem);margin-top:2rem;align-items:start}
@@ -153,6 +161,29 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
 .panel.shot .panel-body{background:#0B0B0A;box-shadow:inset 0 0 0 1px rgba(236,234,228,.14);user-select:none}
 .panel-head b{font-weight:400;color:var(--dim);font-variant-numeric:tabular-nums}
 .panel-body{padding:1rem .95rem;font-family:var(--mono);font-size:.78rem;line-height:1.8;white-space:pre;overflow-x:auto;color:#B9B4A8}
+
+/* live OCR stage */
+.stage{margin-top:1.9rem;border:1px solid var(--line-2);border-radius:9px;background:#0B0B0A;overflow:hidden}
+.stage-head{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;justify-content:space-between;
+  padding:.55rem .7rem;border-bottom:1px solid var(--line);background:var(--bg-3)}
+.steps{display:flex;gap:.25rem}
+.steps button{font-family:var(--mono);font-size:.72rem;letter-spacing:.02em;color:var(--faint);
+  background:transparent;border:1px solid transparent;border-radius:5px;padding:.3rem .55rem;cursor:pointer;
+  transition:color .15s,background .15s,border-color .15s}
+.steps button:hover{color:var(--dim)}
+.steps button[aria-pressed=true]{color:var(--text);background:#2C2A26;border-color:var(--line-2)}
+.stage-meta{font-family:var(--mono);font-size:.72rem;color:var(--faint);font-variant-numeric:tabular-nums;padding-right:.3rem}
+.field{position:relative;margin:0;padding:1.1rem 1.15rem;overflow:hidden}
+.frag{position:absolute;top:0;left:0;font-family:var(--mono);white-space:pre;color:#B9B4A8;
+  border:1px solid transparent;margin:-1px;padding:0 1px;border-radius:2px;
+  transition:transform .62s var(--ease),color .62s var(--ease),border-color .4s linear;will-change:transform}
+.frag.boxed{border-color:rgba(155,150,138,.42)}
+.band{position:absolute;left:.5rem;right:.5rem;border-radius:3px;background:rgba(229,72,77,.09);
+  border-left:2px solid rgba(229,72,77,.55);opacity:0;transition:opacity .45s var(--ease);pointer-events:none}
+.band.on{opacity:1}
+.frag.lit{color:var(--text)}
+.verdict{margin-top:1rem;font-family:var(--mono);font-size:.82rem;color:var(--faint);min-height:1.4em}
+.verdict b{color:#4CC38A;font-weight:500}
 
 /* keys */
 .keys{width:100%;border-collapse:collapse;margin-top:1.5rem}
@@ -187,7 +218,8 @@ footer a:hover{color:var(--text);border-color:var(--dim)}
   .foot-links{text-align:left;flex-direction:row;gap:1.25rem;flex-wrap:wrap}
   nav .links{gap:1.15rem;font-size:.84rem}
   nav .links a[data-hide]{display:none}
-  .row{grid-template-columns:minmax(0,1fr) 56px}
+  .row,.total-row{grid-template-columns:14px minmax(0,1fr) 56px;gap:.7rem}
+  .row .rg{display:none}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms!important;transition-duration:.01ms!important}
@@ -310,7 +342,8 @@ verdict, DESIGN.md, and every shipping raster
 <section id="lines" class="rule">
   <div class="wrap">
     <h2>Every line, accounted for</h2>
-    <p class="sub">This is the whole program. Not the interesting parts of it, not a summary. All of it, grouped by what each region does. If it ever reaches four digits, the argument on this page stops being true and you should hold me to that.</p>
+    <p class="sub">This is the whole program. Not the interesting parts of it, not a summary. All of it, grouped by what each region does. Open any row to read it right here, and check the line
+      range against the file yourself. If it ever reaches four digits, the argument on this page stops being true and you should hold me to that.</p>
     <div class="manifest" id="manifest"></div>
   </div>
 </section>
@@ -319,33 +352,29 @@ verdict, DESIGN.md, and every shipping raster
   <div class="wrap">
     <h2>OCR that keeps the columns</h2>
     <p class="sub">Vision returns recognized text as a bag of bounding boxes, so the straightforward implementation pastes back a flattened blob. Shotty estimates character width from the median box, maps every fragment back to a column, and reprints the block, so indentation, column gaps and paragraph breaks survive and a screenshot of code comes back as code. The whole OCR path is 80 lines; the column reconstruction itself is <code>Overlay.layout(_:)</code>, 44 of them.</p>
-    <div class="cols">
-      <div class="panel shot">
-        <div class="panel-head">the lit selection<b>412 × 196</b></div>
-        <div class="panel-body">func schedule(_ items: [Item]) {
-    for item in items {
-        guard item.isReady else {
-            log.warn("skipping \(item.id)")
-            continue
-        }
-        queue.append(item)
-    }
-}</div>
+
+    <div class="stage" id="ocrStage">
+      <div class="stage-head">
+        <div class="steps" id="ocrSteps">
+          <button type="button" data-step="0" aria-pressed="true">boxes from Vision</button>
+          <button type="button" data-step="1" aria-pressed="false">rows resolved</button>
+          <button type="button" data-step="2" aria-pressed="false">columns resolved</button>
+        </div>
+        <span class="stage-meta" id="ocrMeta"></span>
       </div>
+      <div class="field" id="ocrField"></div>
+    </div>
+
+    <div class="cols" style="margin-top:1.25rem">
+      <p class="demo-note" style="margin:0">This runs the real reconstruction in your browser, not a recording of it. The fragments carry the noise Vision actually returns, and the third step places every one of them using nothing but the median character width the algorithm derives from the boxes themselves. Nudge the steps yourself.</p>
       <div class="panel">
         <div class="panel-head">⌘R → your clipboard<b>selectable text</b></div>
-        <div class="panel-body">func schedule(_ items: [Item]) {
-    for item in items {
-        guard item.isReady else {
-            log.warn("skipping \(item.id)")
-            continue
-        }
-        queue.append(item)
-    }
-}</div>
+        <div class="panel-body" id="ocrOut"></div>
       </div>
     </div>
-    <p class="demo-note" style="margin-top:1.1rem"><span style="color:var(--dim)">Character for character, column for column: that identity is the entire feature.</span> Try to select the left panel and you cannot, because it stands for pixels; the right one is real text. Small selections are upscaled 2× before recognition, and language correction is off by default so it stops "fixing" your identifiers. One flag at the top of the file turns it back on if you mostly capture prose.</p>
+    <p class="verdict" id="ocrVerdict"></p>
+
+    <p class="demo-note">Small selections are upscaled 2× before recognition, and language correction is off by default so it stops "fixing" your identifiers. One flag at the top of the file turns it back on if you mostly capture prose.</p>
   </div>
 </section>
 
@@ -390,6 +419,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   </div>
 </footer>
 
+<script src="source.js"></script>
 <script>
 (function(){
   var NS='http://www.w3.org/2000/svg';
@@ -569,16 +599,176 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     en.forEach(function(x){ if(x.isIntersecting&&!seen){ seen=true; setTimeout(ghost,320); } });
   },{threshold:.5}).observe(screen);
 
-  // manifest
-  var M=[["Imports and settings",11],["Overlay state and init",23],["Drawing the overlay",74],
-    ["Mouse: select and annotate",43],["Keyboard",22],["Toolbar",52],["Export: copy and save",22],
-    ["OCR",80],["Window and capture",40],["Global hotkey",7],["App and launch",19]];
+  // manifest - every number and every line comes from sync.py, never from hand
+  var D=window.SHOTTY, CHEV='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
+    'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
   var out='';
-  M.forEach(function(r){
-    out+='<div class="row"><div class="nm">'+r[0]+'</div><div class="ct">'+r[1]+'</div></div>';
+  D.regions.forEach(function(r,i){
+    out+='<button class="row" aria-expanded="false" aria-controls="src'+i+'">'+CHEV+
+      '<span class="nm">'+r.name+'</span>'+
+      '<span class="rg">'+r.from+'–'+r.to+'</span>'+
+      '<span class="ct">'+r.lines+'</span></button>'+
+      '<div class="src" id="src'+i+'" hidden><pre>'+r.html+'</pre></div>';
   });
-  out+='<div class="row total"><div class="nm">main.swift</div><div class="ct">393</div></div>';
-  document.getElementById('manifest').innerHTML=out;
+  out+='<div class="total-row"><span></span><span class="nm">main.swift</span>'+
+    '<span class="rg">1–'+D.fileLines+'</span><span class="ct">'+D.total+'</span></div>';
+  var man=document.getElementById('manifest');
+  man.innerHTML=out;
+  man.addEventListener('click',function(e){
+    var b=e.target.closest('.row'); if(!b) return;
+    var open=b.getAttribute('aria-expanded')==='true';
+    b.setAttribute('aria-expanded',!open);
+    document.getElementById(b.getAttribute('aria-controls')).hidden=open;
+  });
+
+  // the demo screen shows the same generated excerpt
+  document.getElementById('code').innerHTML=D.excerpt.html;
+  document.querySelector('.screen-title').textContent=
+    'main.swift:'+D.excerpt.from+'–'+D.excerpt.to+' — verbatim, dedented';
+
+  // ── live OCR reconstruction ─────────────────────────────────────────
+  // Overlay.layout(_:) ported to JS. The fragments below carry synthetic noise
+  // standing in for what Vision returns; the reconstruction itself is the real
+  // algorithm, so if the port is wrong the third step visibly breaks.
+  (function(){
+    var SAMPLE=[
+      'func schedule(_ items: [Item]) {',
+      '    for item in items {',
+      '        guard item.isReady else {',
+      '            log.warn("skipping \\(item.id)")',
+      '            continue',
+      '        }',
+      '        queue.append(item)',
+      '    }',
+      '}'];
+    var field=document.getElementById('ocrField'), meta=document.getElementById('ocrMeta'),
+        outEl=document.getElementById('ocrOut'), verdict=document.getElementById('ocrVerdict'),
+        steps=document.getElementById('ocrSteps'), stage=document.getElementById('ocrStage');
+    if(!field) return;
+    var took=false;
+    var COLS=Math.max.apply(null,SAMPLE.map(function(l){return l.length;})),
+        ROWS=SAMPLE.length, CW=1/COLS, LH=1/ROWS, step=0, els=[], truth=[], boxes=[];
+
+    // truth: every run of non-space characters, with the column it really sits at
+    SAMPLE.forEach(function(line,row){
+      var re=/\S+/g, m;
+      while((m=re.exec(line))!==null) truth.push({s:m[0],row:row,col:m.index});
+    });
+
+    // a deterministic wobble, so the demo is the same for everyone who reads it
+    var seed=7; function rnd(){ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff-.5; }
+    truth.forEach(function(t){
+      boxes.push({s:t.s,
+        x:t.col*CW + rnd()*CW*.5,
+        y:1-(t.row+.5)*LH + rnd()*LH*.28,
+        w:t.s.length*CW*(1+rnd()*.06),
+        h:LH*.62*(1+rnd()*.12)});
+    });
+
+    function layout(pieces){
+      var ws=pieces.filter(function(p){return p.s.length>2;})
+                   .map(function(p){return p.w/p.s.length;}).sort(function(a,b){return a-b;});
+      var charW=ws.length?ws[ws.length>>1]:0.01;
+      var hs=pieces.map(function(p){return p.h;}).sort(function(a,b){return a-b;});
+      var lineH=Math.max(hs[hs.length>>1],0.001);
+      var lines=[];
+      pieces.slice().sort(function(a,b){return b.y-a.y;}).forEach(function(p){
+        var last=lines[lines.length-1];
+        if(last&&Math.abs(last[0].y-p.y)<lineH*0.5) last.push(p); else lines.push([p]);
+      });
+      var out=[],place=[];
+      lines.forEach(function(line,ri){
+        var row=line.slice().sort(function(a,b){return a.x-b.x;}), text='';
+        row.forEach(function(p){
+          var col=Math.round(p.x/charW);
+          if(col>text.length) text+=Array(col-text.length+1).join(' ');
+          else if(text.length) text+=' ';
+          place.push({p:p,row:ri,col:text.length});
+          text+=p.s;
+        });
+        out.push(text);
+      });
+      return {text:out.join('\n'),charW:charW,lineH:lineH,rows:lines.length,place:place};
+    }
+
+    var res=layout(boxes), adv=0, lh=0, bands=[];
+
+    function build(){
+      field.innerHTML='';
+      var probe=document.createElement('span');
+      probe.className='frag'; probe.textContent='0'.repeat(40);
+      field.appendChild(probe);
+      var fs=Math.max(10,Math.min(13,(field.clientWidth-40)/COLS/0.601));
+      probe.style.fontSize=fs+'px';
+      adv=probe.getBoundingClientRect().width/40; lh=fs*1.75;
+      field.removeChild(probe);
+      field.style.height=(ROWS*lh+22)+'px';
+      bands=[];
+      for(var r=0;r<res.rows;r++){
+        var d=document.createElement('div');
+        d.className='band';
+        d.style.height=(lh*.92)+'px';
+        d.style.transform='translateY('+(r*lh-lh*.06)+'px)';
+        field.appendChild(d); bands.push(d);
+      }
+      els=boxes.map(function(b,i){
+        var e=document.createElement('span');
+        e.className='frag'; e.style.fontSize=fs+'px'; e.textContent=b.s;
+        field.appendChild(e); return e;
+      });
+      apply();
+    }
+
+    function apply(){
+      var byBox=new Map(); res.place.forEach(function(q){ byBox.set(q.p,q); });
+      els.forEach(function(e,i){
+        var b=boxes[i], t=truth[i], q=byBox.get(b), x, y;
+        if(step===0){ x=(b.x/CW)*adv; y=((1-b.y)/LH-.5)*lh; }
+        else if(step===1){ x=(b.x/CW)*adv; y=q.row*lh; }
+        else { x=q.col*adv; y=q.row*lh; }
+        e.style.transform='translate('+x.toFixed(2)+'px,'+y.toFixed(2)+'px)';
+        e.classList.toggle('lit',step===2);
+        e.classList.toggle('boxed',step===0);
+      });
+      bands.forEach(function(d){ d.classList.toggle('on',step===1); });
+      meta.textContent=step===0
+        ? boxes.length+' fragments · no order, no rows'
+        : step===1
+          ? boxes.length+' fragments → '+res.rows+' rows · median line height '+res.lineH.toFixed(4)
+          : 'median char width '+res.charW.toFixed(4)+' · every fragment placed by column';
+      steps.querySelectorAll('button').forEach(function(b){
+        b.setAttribute('aria-pressed', String(+b.dataset.step===step)); });
+      if(step===2){
+        outEl.textContent=res.text;
+        var ok=res.text===SAMPLE.join('\n');
+        verdict.innerHTML=ok
+          ? '<b>identical to the source</b> — '+res.text.length+' characters, every column back where it started'
+          : 'reconstruction differs from the source; the port is wrong';
+      } else {
+        outEl.innerHTML='<span style="color:var(--faint)">nothing yet \u2014 the text appears once the columns resolve</span>';
+        verdict.textContent='';
+      }
+    }
+
+    steps.addEventListener('click',function(e){
+      var b=e.target.closest('button[data-step]'); if(!b) return;
+      took=true; step=+b.dataset.step; apply();
+    });
+
+    build();
+    addEventListener('resize',build);
+
+    var played=false;
+    new IntersectionObserver(function(en){
+      en.forEach(function(x){
+        if(!x.isIntersecting||played) return;
+        played=true;
+        if(reduce){ step=2; apply(); return; }
+        setTimeout(function(){ if(!took){ step=1; apply(); } },700);
+        setTimeout(function(){ if(!took){ step=2; apply(); } },1750);
+      });
+    },{threshold:.4}).observe(stage);
+  })();
 
   // copy
   var btn=document.getElementById('copy-clone'), lbl=document.getElementById('clone-label');
