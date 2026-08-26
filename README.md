@@ -1,20 +1,27 @@
-# Shotty — Lightshot for Mac
+# Shotty
 
-Press a key. Drag a box. Draw on it. Copy it.
+**An open source, 393-line screenshot tool for macOS.** Capture a region, draw on it, copy
+it — or OCR it with the indentation intact. Small enough to read before you run it.
 
-macOS ships a decent screenshot tool, but there is no moment between *selecting* and
-*saving* where you can actually mark something up. You capture, a thumbnail slides in,
-you race the timer to click it, Markup opens in a separate window, and by then the point
-is gone. Shotty puts the annotation step exactly where Lightshot puts it: on the screen
-you just froze, before anything is written anywhere.
+```bash
+wc -l main.swift                  # 459 lines, 393 of them code
+grep -c 'URLSession\|http' main.swift   # 0 — there is no network code
+```
 
-- **One shortcut** — `⌘⇧2` freezes the screen and dims it.
-- **Select in place** — drag a box; your selection stays lit, everything else stays dark.
-- **Draw before you commit** — pen, rectangle, arrow, highlighter, 5 colours, undo. Nothing
-  has been copied or saved yet, and nothing will be until you say so.
-- **OCR that keeps the layout** — `⌘R` reads the selection and puts the text on your
-  clipboard with the indentation intact. Code stays code.
-- **~450 lines of Swift, no dependencies, no menu bar clutter, no telemetry, no account.**
+That is the whole pitch. Every other screenshot tool on this platform is a closed binary
+with a feature list. This is one Swift file under MIT: no dependencies, no build system, no
+account, no telemetry, and nothing that talks to a server. Read it over a coffee, fork it,
+change whatever annoys you.
+
+## What it does
+
+Press `⌘⇧2`. The screen freezes and dims. Drag a box — your selection stays lit, everything
+else stays dark. Draw on it with pen, rectangle, arrow or highlighter. **Nothing has been
+copied or saved yet**, and nothing will be until you press Copy, Save or OCR.
+
+The macOS built-in tool captures first and lets you annotate afterwards, in a window that
+opens somewhere else, after you catch a thumbnail before it expires. Shotty puts the
+drawing step where the selection already is.
 
 ## Install
 
@@ -25,18 +32,19 @@ git clone https://github.com/uuu4/shotty.git
 cd shotty && ./build.sh && open Shotty.app
 ```
 
+`build.sh` is `swiftc` plus an Info.plist — read that too, it is 25 lines.
+
 The first capture asks for Screen Recording permission (System Settings → Privacy &
 Security → Screen Recording). Grant it, then `open Shotty.app` once more. Shotty lives in
-the menu bar as `✂︎` — no Dock icon.
-
-To launch it at login: System Settings → General → Login Items → `+` → `Shotty.app`.
+the menu bar as `✂︎`, with no Dock icon. To start it at login: System Settings → General →
+Login Items → `+` → `Shotty.app`.
 
 ## Keys
 
 | | |
 |---|---|
 | `⌘⇧2` | capture |
-| drag | select an area — drag again outside it to reselect |
+| drag | select an area — drag outside it to reselect |
 | `P` `R` `A` `H` | pen · rectangle · arrow · highlighter |
 | `⌘Z` | undo last stroke |
 | `⌘C` / `Return` | copy the selection to the clipboard |
@@ -46,18 +54,21 @@ To launch it at login: System Settings → General → Login Items → `+` → `
 
 ## The OCR
 
-Vision returns text as a bag of boxes, which is why most OCR output arrives as one
-flattened blob. Shotty estimates character width from the median box, maps every fragment
-back to a column, and reprints the block with its indentation, column gaps and paragraph
-breaks. Small selections get upscaled 2× first, and language correction is off by default
-so it stops "fixing" your identifiers — flip `ocrLanguageCorrection` at the top of
+Vision hands back text as a bag of bounding boxes, so the straightforward implementation
+returns a flattened blob. Shotty estimates character width from the median box, maps every
+fragment back to a column, and reprints the block — indentation, column gaps and paragraph
+breaks survive, so screenshotting a code block returns something you can paste into an
+editor. Small selections are upscaled 2× first, and language correction is off by default
+so it stops "fixing" your identifiers. Flip `ocrLanguageCorrection` at the top of
 `main.swift` if you mostly capture prose.
+
+It is about 60 lines, in `Overlay.layout(_:)`. That is the part worth reading.
 
 ## Not doing
 
-Text tool, resize handles, upload-to-a-server links, history, cloud anything. Screenshots
-belong on your clipboard, not on someone's bucket.
+Text tool, resize handles, upload links, history, cloud sync, updater, analytics. Each one
+costs lines, and the line count is the point.
 
 ## License
 
-MIT
+MIT — fork it, change the keybinding, ship your own.
