@@ -82,7 +82,14 @@ Two, and both prove a claim the page makes. Neither is decoration, and that is t
 future one has to pass.
 
 1. **The capture gesture** (hero). Drag on the page: it dims outside your box, lights inside,
-   and the toolbar appears under the selection. The surface is a real screenshot the owner
+   and the toolbar appears under the selection. Beside it, **what lands on your clipboard** —
+   the selected pixels cropped out of the real image with your strokes baked in, drawn to a
+   canvas from the same source and the same paths. The demo used to stop at the gesture and
+   never show the result, which left the story a beat short.
+
+   Everything here derives from the screen's measured box, so nothing reads a cached one:
+   `size()` runs at the top of every interaction. A page loaded in a collapsed or hidden
+   state otherwise hands the first drag a box that does not exist. The surface is a real screenshot the owner
    supplied (`docs/shot.webp`), because an authored mock read as a diagram and the point of
    the demo is recognition — people screenshot pages, not diagrams.
 

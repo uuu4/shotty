@@ -163,6 +163,12 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
   padding:0;margin:0 1px;transition:transform .15s var(--ease)}
 .swatch:hover{transform:scale(1.15)}
 .swatch[aria-pressed=true]{border-color:var(--text)}
+.clip{padding:.85rem;display:grid;place-items:center;min-height:118px;background:#0B0B0A}
+.clip canvas{max-width:100%;height:auto;display:none;border-radius:2px;
+  box-shadow:0 6px 18px -6px rgba(0,0,0,.8)}
+.clip canvas.on{display:block}
+.clip #clipEmpty{font-family:var(--mono);font-size:.74rem;color:var(--faint)}
+.clip.filled #clipEmpty{display:none}
 .demo-note{margin-top:1rem;font-size:.86rem;color:var(--faint);max-width:68ch}
 .demo-note kbd{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI Symbol",var(--mono);
   font-size:.82em;color:var(--dim);border:1px solid var(--line-2);border-radius:4px;padding:.05em .35em}
@@ -362,7 +368,13 @@ verdict, DESIGN.md, and every shipping raster
         <button class="tool" id="reset" title="Start over (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
     </div>
-    <p class="demo-note">In the app the same toolbar carries Copy, Save and OCR, and the keys are <kbd>P</kbd> <kbd>R</kbd> <kbd>A</kbd> <kbd>H</kbd> for the tools, <kbd>⌘C</kbd> to copy the lit region, <kbd>⌘R</kbd> to read its text. Drag outside your selection to start a new one.</p>
+    <div class="cols" style="margin-top:1.15rem">
+      <p class="demo-note" style="margin:0">In the app the same toolbar carries Copy, Save and OCR, and the keys are <kbd>P</kbd> <kbd>R</kbd> <kbd>A</kbd> <kbd>H</kbd> for the tools, <kbd>⌘C</kbd> to copy the lit region, <kbd>⌘R</kbd> to read its text. Drag outside your selection to start a new one.</p>
+      <div class="panel">
+        <div class="panel-head">⌘C → your clipboard<b id="clipDim">nothing selected</b></div>
+        <div class="clip"><canvas id="clipCanvas"></canvas><span id="clipEmpty">drag a box above and this fills in</span></div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -515,6 +527,53 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
       'stroke-linecap':'round','stroke-linejoin':'round'});
   }
 
+  // what actually lands on the clipboard: the selected pixels with the strokes
+  // baked in. Same source image, same paths — not an illustration of the result.
+  var clipC=document.getElementById('clipCanvas'), clipDim=document.getElementById('clipDim'),
+      clipWrap=clipC?clipC.parentElement:null, shotEl=document.getElementById('shot');
+  function renderClip(){
+    if(!clipC) return;
+    if(!sel||sel.w<8||sel.h<8||!shotEl.naturalWidth){
+      clipC.classList.remove('on'); clipWrap.classList.remove('filled');
+      clipDim.textContent='nothing selected'; return;
+    }
+    var dispW=shotEl.getBoundingClientRect().width;
+    if(!dispW){ clipC.classList.remove('on'); clipWrap.classList.remove('filled'); return; }
+    var scale=shotEl.naturalWidth/dispW;
+    var dpr=Math.min(devicePixelRatio||1,2);
+    clipC.width=Math.round(sel.w*dpr); clipC.height=Math.round(sel.h*dpr);
+    clipC.style.width=Math.min(sel.w,clipWrap.clientWidth-28)+'px';
+    var g=clipC.getContext('2d');
+    g.setTransform(dpr,0,0,dpr,0,0);
+    g.drawImage(shotEl, sel.x*scale, sel.y*scale, sel.w*scale, sel.h*scale, 0,0, sel.w, sel.h);
+    g.translate(-sel.x,-sel.y);
+    strokes.concat(cur?[cur]:[]).forEach(function(st){ paint(g,st); });
+    clipC.classList.add('on'); clipWrap.classList.add('filled');
+    clipDim.textContent=Math.round(sel.w*scale)+' × '+Math.round(sel.h*scale)+' px';
+  }
+  function paint(g,st){
+    var p=st.pts; if(p.length<2) return;
+    g.save();
+    g.strokeStyle=st.color; g.lineCap='round'; g.lineJoin='round';
+    g.lineWidth=st.tool==='highlight'?16:3;
+    g.globalAlpha=st.tool==='highlight'?.3:1;
+    g.beginPath();
+    if(st.tool==='pen'||st.tool==='highlight'){
+      g.moveTo(p[0][0],p[0][1]);
+      for(var i=1;i<p.length;i++) g.lineTo(p[i][0],p[i][1]);
+    } else if(st.tool==='rect'){
+      g.rect(Math.min(p[0][0],p[1][0]),Math.min(p[0][1],p[1][1]),
+             Math.abs(p[1][0]-p[0][0]),Math.abs(p[1][1]-p[0][1]));
+    } else {
+      var a=p[0],b=p[1],ang=Math.atan2(b[1]-a[1],b[0]-a[0]),L=14;
+      g.moveTo(a[0],a[1]); g.lineTo(b[0],b[1]);
+      [Math.PI*.85,-Math.PI*.85].forEach(function(t){
+        g.moveTo(b[0],b[1]); g.lineTo(b[0]+Math.cos(ang+t)*L, b[1]+Math.sin(ang+t)*L);
+      });
+    }
+    g.stroke(); g.restore();
+  }
+
   function placeBar(){
     if(!sel){ bar.classList.remove('on'); return; }
     bar.classList.add('on');
@@ -531,6 +590,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   screen.addEventListener('dragstart',function(e){ e.preventDefault(); });
   screen.addEventListener('pointerdown',function(e){
     if(e.target.closest('#bar')) return;
+    size();                        // never trust a cached box at interaction time
     e.preventDefault();            // otherwise the browser starts dragging the image
     screen.focus({preventScroll:true});   // preventDefault swallows focus; take it back without scrolling the page
     userTook=true;                 // stops the teaching animation mid-flight
@@ -566,7 +626,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
       if(cur.pts.length>=2) strokes.push(cur);
       cur=null; syncTools();
     }
-    start=null; draw();
+    start=null; draw(); renderClip();
   });
 
   function syncTools(){
@@ -580,18 +640,18 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     if(t) tool=t.dataset.tool;
     if(c) color=c.dataset.color;
     if(e.target.closest('#undo')){ strokes.pop(); draw(); }
-    syncTools();
+    syncTools(); renderClip();
     if(e.target.closest('#reset')){ sel=null;strokes=[];cur=null;mode='idle';
-      bar.classList.remove('on');hint.style.opacity=1;draw(); }
+      bar.classList.remove('on');hint.style.opacity=1;draw();renderClip(); }
   });
 
   screen.addEventListener('keydown',function(e){
     var k=e.key.toLowerCase(), map={p:'pen',r:'rect',a:'arrow',h:'highlight'};
     if(mode==='idle'){
       if(k==='enter'||k===' '){        // pointerless way into the demo
-        e.preventDefault(); userTook=true;
+        e.preventDefault(); userTook=true; size();
         sel={x:W*.02,y:H*.705,w:W*.45,h:H*.055}; mode='editing'; strokes=[];
-        hint.style.opacity=0; draw(); placeBar(); syncTools();
+        hint.style.opacity=0; draw(); placeBar(); syncTools(); renderClip();
       }
       return;
     }
@@ -610,7 +670,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     lastW=W; lastH=H;
     sel=null; strokes=[]; cur=null; mode='idle';
     bar.classList.remove('on'); hint.style.opacity=1;
-    draw();
+    draw(); renderClip();
     arm();
   }
   if(window.ResizeObserver) new ResizeObserver(sync).observe(screen);
@@ -620,9 +680,10 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   // one authored moment: a ghost drag teaches the gesture, once, then hands over
   function ghost(){
     size();
+    if(W<80||H<80) return;         // the box is not real yet; the observer will call again
     if(reduce){ sel={x:W*.02,y:H*.705,w:W*.45,h:H*.055}; mode='editing';
       strokes=[{tool:'pen',color:'#E5484D',pts:[[W*.05,H*.752],[W*.42,H*.752]]}];
-      hint.style.opacity=0; draw(); placeBar(); syncTools(); return; }
+      hint.style.opacity=0; draw(); placeBar(); syncTools(); renderClip(); return; }
     var a=[W*.02,H*.705], b=[W*.47,H*.762], t0=null, dur=900;
     mode='selecting';
     function step(ts){
@@ -639,7 +700,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
           cur={tool:'pen',color:'#E5484D',pts:[p0,[p0[0]+(p1[0]-p0[0])*ee,p1[1]]]};
           draw();
           if(kk<1) requestAnimationFrame(pen);
-          else { strokes.push(cur); cur=null; draw(); }
+          else { strokes.push(cur); cur=null; draw(); renderClip(); }
         }
         setTimeout(function(){ requestAnimationFrame(pen); },160);
       }
