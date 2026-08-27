@@ -128,6 +128,22 @@ Themed, not defaulted: `::selection` in tinted mark red, `:focus-visible` as a 2
 at 3px offset, scrollbars in `--line-2` on the ground with a 3px inset. These are cheap and
 they are the difference between built and assembled.
 
+## Two failure modes this page has already hit
+
+**Class-name collisions.** `.steps` was the OCR stage's segmented control and also
+`ol.steps` in Install. `display:flex` from one laid the other out sideways and made the
+whole page scroll horizontally. Component classes here are prefixed by their owner
+(`.stage-steps`, `.panel-head`, `.row .rg`); a bare generic noun is a trap.
+
+**Grid items blowing out their track.** Grid and flex children default to
+`min-width:auto`, so any `white-space:pre` descendant — a command, a terminal block, a
+table — widens the column past the viewport and the page scrolls sideways. Every grid
+child that can contain preformatted content carries `min-width:0`.
+
+Neither is caught by the detector or by looking at a desktop screenshot. The check that
+finds them is one line: compare `document.documentElement.scrollWidth` to `clientWidth`
+at a narrow width, and if they differ, list every element whose `right` exceeds it.
+
 ## Rules that outlive this page
 
 1. Any claim on any surface must be verifiable by a command the visitor can run. If the
