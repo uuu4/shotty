@@ -152,6 +152,10 @@ the file's code lines, so a drifted count fails loudly instead of shipping.
 
 **Run `python3 docs/sync.py` after any change to `main.swift`.**
 
+The expanded source carries the file's own line numbers, seeded from each region's real
+start. A row that says 45–131 and then shows unnumbered code is asking to be taken on trust,
+which is the one thing this page does not ask for anywhere else.
+
 It writes two files. `source.js` carries the numbers — counts, ranges, the OCR sample — and
 is ~1.3 kB. `source-bodies.js` carries the highlighted source behind the manifest rows, is
 ~31 kB, and is fetched the first time someone actually opens a row. 91% of the payload was

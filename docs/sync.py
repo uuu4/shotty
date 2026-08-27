@@ -49,9 +49,14 @@ def highlight(line):
     if comment:                                     out += '<span class="c">%s</span>' % html.escape(comment)
     return out
 
-def block(lines, dedent=True):
+def block(lines, dedent=True, numbered=False):
     n = min((len(l) - len(l.lstrip()) for l in lines if l.strip()), default=0) if dedent else 0
-    return "\n".join(highlight(l[n:]) if l.strip() else "" for l in lines)
+    out = [highlight(l[n:]) if l.strip() else "" for l in lines]
+    if not numbered:
+        return "\n".join(out)
+    # one span per line so the gutter can count: a range you cannot map back to the
+    # file is a range you have to take on trust
+    return "".join('<span class="l">%s</span>' % o for o in out)
 
 def main():
     src = io.open(SRC, encoding="utf-8").read().split("\n")
@@ -63,7 +68,7 @@ def main():
         n = code_lines(chunk)
         total += n
         regions.append({"name": name, "from": a, "to": b, "lines": n,
-                        "html": block(chunk)})
+                        "html": block(chunk, dedent=False, numbered=True)})
 
     counted = code_lines(src)
     assert total == counted, "regions cover %d lines, file has %d" % (total, counted)

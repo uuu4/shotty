@@ -29,7 +29,7 @@
 :root{
   --bg:#111110; --bg-2:#191917; --bg-3:#201F1C;
   --line:#2B2A26; --line-2:#3A3833;
-  --text:#ECEAE4; --dim:#9B968A; --faint:#8F8A7E;
+  --text:#ECEAE4; --dim:#9B968A; --faint:#8F8A7E; --ghost-num:#5F5B53;
   --mark:#E5484D;
   --sans:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -189,7 +189,11 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
   font-variant-numeric:tabular-nums}
 .src{border-bottom:1px solid var(--line);background:#0D0D0C;overflow-x:auto}
 .src pre{outline-offset:-3px}
-.src pre{margin:0;padding:1rem 1.1rem;font-family:var(--mono);font-size:.74rem;line-height:1.75;color:#B9B4A8}
+.src pre{margin:0;padding:1rem 1.1rem 1rem 0;font-family:var(--mono);font-size:.74rem;
+  line-height:1.75;color:#B9B4A8;counter-reset:l}
+.src .l{display:block;counter-increment:l;white-space:pre}
+.src .l::before{content:counter(l);display:inline-block;width:3.4em;padding-right:1.1em;
+  text-align:right;color:var(--ghost-num);font-variant-numeric:tabular-nums;user-select:none}
 .src .k{color:#C58AF0}.src .c{color:#8A8579}.src .num{color:#E0A458}
 .total-row{display:grid;grid-template-columns:18px minmax(0,1fr) 96px 62px;align-items:center;
   gap:1rem;padding:1.05rem .5rem 0 0}
@@ -389,7 +393,7 @@ verdict, DESIGN.md, and every shipping raster
     <h2>Every line, accounted for</h2>
     <p class="sub">This is the whole program. Not the interesting parts of it, not a summary. All of it, grouped by what each region does. Open any row to read it right here, and check the line
       range against the file yourself. If it ever reaches four digits, the argument on this page stops being true and you should hold me to that.</p>
-    <div class="manifest" id="manifest" data-bodies="source-bodies.js?v=665383d7"></div>
+    <div class="manifest" id="manifest" data-bodies="source-bodies.js?v=35ab5d29"></div>
     <!--manifest-noscript-->
     <noscript>
       <p class="demo-note" style="margin-bottom:1rem">This table is normally built in your browser
@@ -948,6 +952,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   }
   function want(pre,i){
     pre.dataset.i=i;
+    pre.style.counterReset='l '+(D.regions[i].from-1);   // the file's own numbering
     if(bodies){ pre.innerHTML=bodies[i]; return; }
     pre.textContent='loading main.swift…';
     waiting.push(pre);
