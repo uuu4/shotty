@@ -807,8 +807,21 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     if(armed || H<200) return;           // not a real box yet
     armed=true;
     if(reduce){ seen=true; ghost(); return; }   // no animation to schedule, so do not wait
+    // requestAnimationFrame is paused in a hidden tab, so starting there would hide the
+    // hint and then freeze mid-drag until the tab came forward
+    function play(){
+      if(document.hidden){
+        document.addEventListener('visibilitychange',function once(){
+          if(document.hidden) return;
+          document.removeEventListener('visibilitychange',once);
+          setTimeout(ghost,320);
+        });
+        return;
+      }
+      setTimeout(ghost,320);
+    }
     new IntersectionObserver(function(en){
-      en.forEach(function(x){ if(x.isIntersecting&&!seen){ seen=true; setTimeout(ghost,320); } });
+      en.forEach(function(x){ if(x.isIntersecting&&!seen){ seen=true; play(); } });
     },{threshold:.35}).observe(screen);
   }
 
