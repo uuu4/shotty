@@ -64,8 +64,17 @@ category's laziest container and the proof sections replace it.
   (darker ground `#0B0B0A`, inset 1px light rule standing in for the lit selection, size
   readout in the head).
 - **Icons** — authored SVG, 24-box, 1.8 stroke, round caps and joins. No emoji, no unicode
-  glyphs standing in for icons. The one exception is the ✂ wordmark, which is the app's own
-  menu bar symbol.
+  glyphs standing in for icons, with no exceptions: the wordmark used to be a `✂︎` character
+  and it looked exactly like what it was. `✂︎` appears once, in Install prose, describing the
+  glyph the app actually puts in the menu bar — that is text about a symbol, not a symbol
+  doing an icon's job.
+
+- **The mark** — four selection corners around one lit rectangle, in a 24-box: `stroke-width`
+  2.3 at 60% for the corners, a solid `currentColor` rect at x6.8 y8.4 w8.4 h5.2. It is the
+  app's own gesture, not the category's scissors, and it survives 21px because it is two
+  shapes and no detail. Monochrome deliberately — `--mark` stays reserved, so the 393 keeps
+  the only red above the fold. `docs/icon.svg` carries the same geometry on the ground colour;
+  change one and change both.
 
 ## Live demonstrations
 
