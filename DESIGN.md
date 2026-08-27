@@ -152,6 +152,17 @@ the file's code lines, so a drifted count fails loudly instead of shipping.
 
 **Run `python3 docs/sync.py` after any change to `main.swift`.**
 
+It writes two files. `source.js` carries the numbers — counts, ranges, the OCR sample — and
+is ~1.3 kB. `source-bodies.js` carries the highlighted source behind the manifest rows, is
+~31 kB, and is fetched the first time someone actually opens a row. 91% of the payload was
+source most visitors never read, on a page that argues against shipping what you do not
+need.
+
+Both are content-hashed into their URLs, along with every local asset. That is not tidiness:
+every figure on this page comes out of `source.js`, so a cached copy is the page quoting
+numbers that have moved, and `og.png` is cached by unfurlers under a URL that would outlive
+any redesign of the card.
+
 ## Motion
 
 One authored moment per section, and only one: on first scroll into the demo, a ghost cursor performs a
