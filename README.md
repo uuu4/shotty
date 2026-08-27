@@ -35,7 +35,7 @@ git clone https://github.com/uuu4/shotty.git
 cd shotty && ./build.sh && open Shotty.app
 ```
 
-`build.sh` is `swiftc` plus an Info.plist — read that too, it is 22 lines.
+`build.sh` is 22 lines: an Info.plist, `swiftc`, and an ad-hoc `codesign` — read that too.
 
 The first capture asks for Screen Recording permission (System Settings → Privacy &
 Security → Screen Recording). Grant it, then `open Shotty.app` once more. Shotty lives in
@@ -65,7 +65,7 @@ editor. Small selections are upscaled 2× first, and language correction is off 
 so it stops "fixing" your identifiers. Flip `ocrLanguageCorrection` at the top of
 `main.swift` if you mostly capture prose.
 
-The whole OCR path is 80 lines; `Overlay.layout(_:)` is 44 of them, and that is the part worth reading.
+The whole OCR path is 80 lines; `Overlay.layout(_:)` is 45 of them, and that is the part worth reading.
 
 ## Not doing
 

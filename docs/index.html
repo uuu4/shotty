@@ -37,7 +37,7 @@
   --ease:cubic-bezier(.16,1,.3,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:5rem}
 body{
   background:var(--bg); color:var(--text);
   font-family:var(--sans); font-size:17px; line-height:1.6;
@@ -52,7 +52,7 @@ a{color:inherit; text-decoration:none}
 ::-webkit-scrollbar-thumb:hover{background:#4A4740}
 html{scrollbar-color:var(--line-2) var(--bg)}
 
-.wrap{max-width:1120px;margin:0 auto;padding:0 var(--pad)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 var(--pad)}
 .rule{border-top:1px solid var(--line)}
 code{font-family:var(--mono);font-size:.88em;color:var(--text)}
 
@@ -77,14 +77,14 @@ nav .links a{transition:color .18s}
 nav .links a:hover{color:var(--text)}
 
 /* hero */
-header .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,40%);gap:clamp(1.5rem,4vw,3.5rem);align-items:center}
+header .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,34%);gap:clamp(1.5rem,3.5vw,3rem);align-items:center}
 /* grid items default to min-width:auto, so any white-space:pre child (a command,
    a terminal block, a table) widens the track past the viewport. Pin them to 0. */
 .hero-copy,.cols>*,footer .cols2>*{min-width:0}
 .ascii{position:relative;aspect-ratio:1800/1169;width:100%;overflow:hidden;
   border-radius:6px;background:var(--bg);margin-right:calc(var(--pad) * -1)}
 #asciiGrid{position:absolute;inset:0;margin:0;font-family:var(--mono);white-space:pre;
-  color:#767267;letter-spacing:0;user-select:none}
+  color:#7E7A6F;letter-spacing:0;user-select:none}
 #asciiImg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;
   clip-path:inset(100% 0 0 0);user-select:none}
 #asciiWin{position:absolute;border:1px solid var(--mark);border-radius:1px;opacity:0}
@@ -133,8 +133,8 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
 .sub{margin-top:.9rem;max-width:66ch;color:var(--dim);font-size:1rem;line-height:1.65}
 
 /* demo */
-#demo-sec{padding-top:0}
 .screen:focus-visible{outline:2px solid var(--mark);outline-offset:3px}
+@media (pointer:coarse){.screen{touch-action:auto;cursor:default}}
 .screen{
   position:relative;margin-top:1.75rem;border:1px solid var(--line-2);border-radius:11px;
   background:#0B0B0A;overflow:hidden;box-shadow:0 24px 60px -20px rgba(0,0,0,.75);
@@ -148,7 +148,7 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
 .hint{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);pointer-events:none;
   font-size:.9rem;color:var(--text);background:rgba(11,11,10,.86);padding:.5rem .9rem;border-radius:6px;
   border:1px solid var(--line-2);transition:opacity .4s var(--ease);text-align:center}
-.bar{position:absolute;display:none;align-items:center;gap:.15rem;padding:.3rem;border-radius:7px;
+.bar{position:absolute;display:none;flex-wrap:wrap;max-width:calc(100% - 12px);align-items:center;gap:.15rem;padding:.3rem;border-radius:7px;
   background:rgba(14,14,13,.94);border:1px solid var(--line-2);backdrop-filter:blur(8px);z-index:3;
   box-shadow:0 10px 26px -8px rgba(0,0,0,.8)}
 .bar.on{display:flex}
@@ -188,6 +188,7 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
 .row .ct{font-family:var(--mono);font-size:.88rem;color:var(--dim);text-align:right;
   font-variant-numeric:tabular-nums}
 .src{border-bottom:1px solid var(--line);background:#0D0D0C;overflow-x:auto}
+.src pre{outline-offset:-3px}
 .src pre{margin:0;padding:1rem 1.1rem;font-family:var(--mono);font-size:.74rem;line-height:1.75;color:#B9B4A8}
 .src .k{color:#C58AF0}.src .c{color:#8A8579}.src .num{color:#E0A458}
 .total-row{display:grid;grid-template-columns:18px minmax(0,1fr) 96px 62px;align-items:center;
@@ -197,6 +198,7 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
   text-align:right;font-variant-numeric:tabular-nums}
 
 /* two-col */
+.stack{margin-top:1.25rem}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.5rem,4vw,3.5rem);margin-top:2rem;align-items:start}
 .panel{border:1px solid var(--line);border-radius:9px;background:var(--bg-2);overflow:hidden}
 .panel-head{display:flex;justify-content:space-between;gap:1rem;padding:.6rem .9rem;
@@ -307,7 +309,7 @@ verdict, DESIGN.md, and every shipping raster
   </div>
 </nav>
 
-<main id="content">
+<main id="content" tabindex="-1">
 <header id="top">
   <div class="wrap">
    <div class="hero-copy">
@@ -316,16 +318,16 @@ verdict, DESIGN.md, and every shipping raster
 
     <div class="cta">
       <button class="btn btn-primary" id="copy-clone">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <span id="clone-label">git clone github.com/uuu4/shotty</span>
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span id="clone-label">git clone https://github.com/uuu4/shotty.git</span>
       </button>
       <a class="btn btn-ghost" href="https://github.com/uuu4/shotty/blob/main/main.swift">Read main.swift</a>
     </div>
-    <p class="plat">macOS 13 or later · MIT · no account, no telemetry, no updater</p>
+    <p class="plat">macOS 13 or later</p>
 
     <div class="proof">
       <div class="proof-head">verify it yourself</div>
-      <div class="proof-body"><span class="p">$ </span><span class="c">wc -l main.swift</span>
+      <div class="proof-body" tabindex="0" role="group" aria-label="Verification commands"><span class="p">$ </span><span class="c">wc -l main.swift</span>
 <span class="o">     459 main.swift</span>
 <span class="p">$ </span><span class="c">grep -vc '^[[:space:]]*$\|^[[:space:]]*//' main.swift</span>
 <span class="n">393</span><span class="o">   # lines that are actually code</span>
@@ -343,44 +345,39 @@ verdict, DESIGN.md, and every shipping raster
   </div>
 </header>
 
-<section id="how" class="rule" style="padding-bottom:0">
+<section id="how" class="rule">
   <div class="wrap">
     <h2>The gesture, on this page</h2>
     <p class="sub">macOS captures first and lets you annotate afterwards, in a window that opens somewhere else once you catch the thumbnail before it expires. Shotty puts the drawing step where the selection already is. Try it below, on a real screenshot.</p>
-  </div>
-</section>
-
-<section id="demo-sec">
-  <div class="wrap">
-    <div class="screen" id="screen" tabindex="0" role="application" aria-label="Optional demo of the capture gesture. Press Enter to place a selection, then P, R, A or H to switch tools. Everything it demonstrates is written out in the Keys table further down.">
+    <div class="screen" id="screen" tabindex="0" aria-label="Optional demo of the capture gesture. Press Enter to place a selection, then the arrow keys to move it and P, R, A or H to switch tools.">
       <img id="shot" draggable="false" loading="lazy" decoding="async" src="shot.webp" width="1800" height="1169" alt="A screenshot of a video page, used here as something to select and mark up">
       <svg id="ovl" aria-hidden="true"></svg>
       <div class="readout" id="readout"></div>
       <div class="hint" id="hint" hidden></div>
       <div class="bar" id="bar" role="toolbar" aria-label="Annotation tools">
-        <button class="tool" data-tool="pen" aria-pressed="true" title="Pen (P)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/></svg></button>
-        <button class="tool" data-tool="rect" aria-pressed="false" title="Rectangle (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/></svg></button>
-        <button class="tool" data-tool="arrow" aria-pressed="false" title="Arrow (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19L19 5"/><path d="M11 5h8v8"/></svg></button>
-        <button class="tool" data-tool="highlight" aria-pressed="false" title="Highlighter (H)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16"/><path d="M7 14l8-8 4 4-8 8H7v-4z"/></svg></button>
+        <button class="tool" data-tool="pen" aria-pressed="true" aria-label="Pen" title="Pen (P)"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/></svg></button>
+        <button class="tool" data-tool="rect" aria-pressed="false" aria-label="Rectangle" title="Rectangle (R)"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/></svg></button>
+        <button class="tool" data-tool="arrow" aria-pressed="false" aria-label="Arrow" title="Arrow (A)"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19L19 5"/><path d="M11 5h8v8"/></svg></button>
+        <button class="tool" data-tool="highlight" aria-pressed="false" aria-label="Highlighter" title="Highlighter (H)"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16"/><path d="M7 14l8-8 4 4-8 8H7v-4z"/></svg></button>
         <i class="sep"></i>
-        <button class="swatch" data-color="#E5484D" aria-pressed="true" style="background:#E5484D" title="Red"></button>
-        <button class="swatch" data-color="#F5C518" aria-pressed="false" style="background:#F5C518" title="Yellow"></button>
-        <button class="swatch" data-color="#4C9AFF" aria-pressed="false" style="background:#4C9AFF" title="Blue"></button>
-        <button class="swatch" data-color="#4CC38A" aria-pressed="false" style="background:#4CC38A" title="Green"></button>
-        <button class="swatch" data-color="#ECEAE4" aria-pressed="false" style="background:#ECEAE4" title="White"></button>
+        <button class="swatch" data-color="#E5484D" aria-pressed="true" style="background:#E5484D" aria-label="Red" title="Red"></button>
+        <button class="swatch" data-color="#F5C518" aria-pressed="false" style="background:#F5C518" aria-label="Yellow" title="Yellow"></button>
+        <button class="swatch" data-color="#4C9AFF" aria-pressed="false" style="background:#4C9AFF" aria-label="Blue" title="Blue"></button>
+        <button class="swatch" data-color="#4CC38A" aria-pressed="false" style="background:#4CC38A" aria-label="Green" title="Green"></button>
+        <button class="swatch" data-color="#ECEAE4" aria-pressed="false" style="background:#ECEAE4" aria-label="White" title="White"></button>
         <i class="sep"></i>
-        <button class="tool" id="undo" title="Undo (⌘Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.1-5.6L3 10"/></svg></button>
-        <button class="tool" id="reset" title="Start over (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+        <button class="tool" id="undo" disabled aria-label="Undo the last stroke" title="Undo (⌘Z)"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.1-5.6L3 10"/></svg></button>
+        <button class="tool" id="reset" aria-label="Start over" title="Start over (Esc)"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
     </div>
     <noscript><p class="demo-note">With JavaScript on this screen is live: you drag a box on it,
       everything outside dims, and you draw inside the box before anything is copied. Every key it
       demonstrates is written out in the table further down, and the source of all of it is in
       <code>main.swift</code>.</p></noscript>
-    <div class="cols" style="margin-top:1.15rem">
+    <div class="cols stack">
       <p class="demo-note" style="margin:0">In the app the same toolbar carries Copy, Save and OCR, and the keys are <kbd>P</kbd> <kbd>R</kbd> <kbd>A</kbd> <kbd>H</kbd> for the tools, <kbd>⌘C</kbd> to copy the lit region, <kbd>⌘R</kbd> to read its text. Drag outside your selection to start a new one.</p>
       <div class="panel">
-        <div class="panel-head">⌘C → your clipboard<b id="clipDim">nothing selected</b></div>
+        <div class="panel-head">what ⌘C would copy<b id="clipDim">nothing selected</b></div>
         <div class="clip"><canvas id="clipCanvas"></canvas><span id="clipEmpty">drag a box above and this fills in</span></div>
       </div>
     </div>
@@ -422,7 +419,7 @@ verdict, DESIGN.md, and every shipping raster
 <section id="ocr" class="rule">
   <div class="wrap">
     <h2>OCR that keeps the columns</h2>
-    <p class="sub">Vision returns recognised text as a bag of bounding boxes, so the obvious implementation pastes back a flattened blob. Shotty estimates character width from the median box and maps every fragment to a column, so indentation and column gaps survive. That reconstruction is 44 lines, in <code>Overlay.layout(_:)</code>; the whole OCR path is 80.</p>
+    <p class="sub">Vision returns recognised text as a bag of bounding boxes, so the obvious implementation pastes back a flattened blob. Shotty estimates character width from the median box and maps every fragment to a column, so indentation and column gaps survive. That reconstruction is <span id="layoutLines">45</span> lines, in <code>Overlay.layout(_:)</code>; the whole OCR path is 80.</p>
 
     <div class="stage" id="ocrStage">
       <div class="stage-head">
@@ -431,12 +428,12 @@ verdict, DESIGN.md, and every shipping raster
           <button type="button" data-step="1" aria-pressed="false">rows resolved</button>
           <button type="button" data-step="2" aria-pressed="false">columns resolved</button>
         </div>
-        <span class="stage-meta" id="ocrMeta" aria-live="polite"></span>
+        <span class="stage-meta" id="ocrMeta"></span>
       </div>
       <div class="field" id="ocrField"></div>
     </div>
     <noscript>
-      <div class="cols" style="margin-top:1.25rem">
+      <div class="cols stack">
         <div class="panel">
           <div class="panel-head">the lit selection<b>412 &#215; 196</b></div>
           <div class="panel-body">func schedule(_ items: [Item]) {
@@ -466,11 +463,11 @@ verdict, DESIGN.md, and every shipping raster
         reconstruction above runs in your browser and checks that identity itself.</p>
     </noscript>
 
-    <div class="cols" style="margin-top:1.25rem">
-      <p class="demo-note" style="margin:0">This is that algorithm, ported to JS and running here on fragments that carry the noise Vision actually returns. Step through it yourself.</p>
+    <div class="cols stack">
+      <p class="demo-note" style="margin:0">The column mapping above is that function ported to JS, running here on fragments that carry the noise Vision actually returns. It leaves out the paragraph-break pass, which this sample has nothing to exercise. Step through it yourself.</p>
       <div class="panel">
         <div class="panel-head">⌘R → your clipboard<b>selectable text</b></div>
-        <div class="panel-body" id="ocrOut"></div>
+        <div class="panel-body" id="ocrOut" tabindex="0"></div>
       </div>
     </div>
     <p class="verdict" id="ocrVerdict" role="status" aria-live="polite"></p>
@@ -486,8 +483,8 @@ verdict, DESIGN.md, and every shipping raster
         <h2>Install</h2>
         <p class="sub">There is no signed installer yet. You build it, which takes a few seconds and means you can read what you are running first.</p>
         <ol class="steps">
-          <li><b>Get the command line tools</b> if you don't have them.<code class="cmd">xcode-select --install</code></li>
-          <li><b>Clone and build.</b> <code>build.sh</code> is 22 lines: swiftc plus an Info.plist.<code class="cmd">git clone https://github.com/uuu4/shotty.git
+          <li><b>Get the command line tools</b> if you don't have them.<code class="cmd" tabindex="0">xcode-select --install</code></li>
+          <li><b>Clone and build.</b> <code>build.sh</code> is 22 lines: an Info.plist, <code>swiftc</code>, and an ad-hoc <code>codesign</code> so the Screen Recording grant survives rebuilds.<code class="cmd">git clone https://github.com/uuu4/shotty.git
 cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
           <li><b>Grant Screen Recording</b> on the first capture: System Settings → Privacy &amp; Security → Screen Recording. Then open it once more. Shotty lives in the menu bar as ✂︎, with no Dock icon. macOS 13 or later.</li>
         </ol>
@@ -540,13 +537,21 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   hint.hidden=false;
-  hint.innerHTML='Drag anywhere on this screen<br><span style="color:var(--faint);font-size:.82em">or focus it and press Enter</span>';
+  hint.innerHTML = matchMedia('(pointer:coarse)').matches
+    ? 'A real screenshot.<br><span style="color:var(--faint);font-size:.82em">The drag demo needs a pointer &#8212; the keys are listed below</span>'
+    : 'Drag anywhere on this screen<br><span style="color:var(--faint);font-size:.82em">or focus it and press Enter, then use the arrow keys</span>';
 
   function size(){ var r=ovl.getBoundingClientRect(); W=r.width; H=r.height;
     // viewBox only: writing width/height attributes pins the element to its own
     // first measurement, which is how the drag got trapped in a 300x150 corner
     ovl.setAttribute('viewBox','0 0 '+W+' '+H); }
   function el(n,a){ var e=document.createElementNS(NS,n); for(var k in a) e.setAttribute(k,a[k]); return e; }
+
+  // the only correct factor between what is on screen and what would be copied
+  function outScale(){
+    var w=document.getElementById('shot').getBoundingClientRect().width;
+    return w ? document.getElementById('shot').naturalWidth / w : 1;
+  }
 
   function draw(){
     while(ovl.firstChild) ovl.removeChild(ovl.firstChild);
@@ -567,7 +572,8 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     ovl.appendChild(g);
 
     readout.style.opacity=1;
-    readout.textContent=Math.round(sel.w*2)+' × '+Math.round(sel.h*2);
+    var os=outScale();
+    readout.textContent=Math.round(sel.w*os)+' × '+Math.round(sel.h*os);
     readout.style.left=sel.x+'px';
     readout.style.top=(sel.y>26? sel.y-24 : sel.y+sel.h+6)+'px';
   }
@@ -602,9 +608,8 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
       clipC.classList.remove('on'); clipWrap.classList.remove('filled');
       clipDim.textContent='nothing selected'; return;
     }
-    var dispW=shotEl.getBoundingClientRect().width;
-    if(!dispW){ clipC.classList.remove('on'); clipWrap.classList.remove('filled'); return; }
-    var scale=shotEl.naturalWidth/dispW;
+    if(!shotEl.getBoundingClientRect().width){ clipC.classList.remove('on'); clipWrap.classList.remove('filled'); return; }
+    var scale=outScale();
     var dpr=Math.min(devicePixelRatio||1,2);
     clipC.width=Math.round(sel.w*dpr); clipC.height=Math.round(sel.h*dpr);
     clipC.style.width=Math.min(sel.w,clipWrap.clientWidth-28)+'px';
@@ -655,6 +660,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   screen.addEventListener('dragstart',function(e){ e.preventDefault(); });
   screen.addEventListener('pointerdown',function(e){
     if(e.target.closest('#bar')) return;
+    if(e.pointerType==='touch') return;   // a phone needs its scroll more than it needs this
     size();                        // never trust a cached box at interaction time
     e.preventDefault();            // otherwise the browser starts dragging the image
     screen.focus({preventScroll:true});   // preventDefault swallows focus; take it back without scrolling the page
@@ -683,10 +689,15 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     draw();
   });
 
+  screen.addEventListener('pointercancel',function(){
+    if(mode==='selecting'){ sel=null; mode='idle'; hint.style.opacity=1; }
+    cur=null; start=null; draw(); renderClip(); syncTools();
+  });
+
   screen.addEventListener('pointerup',function(e){
     if(mode==='selecting'){
       if(!sel||sel.w<12||sel.h<12){ sel=null; mode='idle'; hint.style.opacity=1; draw(); return; }
-      mode='editing'; placeBar();
+      mode='editing'; placeBar(); syncTools();
     } else if(cur){
       if(cur.pts.length>=2) strokes.push(cur);
       cur=null; syncTools();
@@ -721,7 +732,21 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
       return;
     }
     if(map[k]){ tool=map[k]; syncTools(); }
-    if(k==='escape'){ sel=null;strokes=[];mode='idle';bar.classList.remove('on');hint.style.opacity=1;draw(); }
+    var arrows={arrowleft:[-1,0],arrowright:[1,0],arrowup:[0,-1],arrowdown:[0,1]};
+    if(arrows[k]&&sel){                       // a box you cannot move is not an affordance
+      e.preventDefault();
+      var d=arrows[k], step=e.altKey?1:12;
+      if(e.shiftKey){
+        sel.w=Math.max(16,Math.min(W-sel.x, sel.w+d[0]*step));
+        sel.h=Math.max(16,Math.min(H-sel.y, sel.h+d[1]*step));
+      } else {
+        sel.x=Math.max(0,Math.min(W-sel.w, sel.x+d[0]*step));
+        sel.y=Math.max(0,Math.min(H-sel.h, sel.y+d[1]*step));
+      }
+      draw(); placeBar(); renderClip();
+    }
+    if(k==='escape'){ sel=null;strokes=[];cur=null;mode='idle';bar.classList.remove('on');
+      hint.style.opacity=1;draw();renderClip();syncTools(); }
     if((e.metaKey||e.ctrlKey)&&k==='z'){ e.preventDefault(); strokes.pop(); draw(); syncTools(); }
   });
 
@@ -738,12 +763,15 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     draw(); renderClip();
     arm();
   }
+  var shotImg=document.getElementById('shot');
+  if(shotImg) shotImg.addEventListener('load',function(){ renderClip(); });
   if(window.ResizeObserver) new ResizeObserver(sync).observe(screen);
   else addEventListener('resize',sync);
   sync();
 
   // one authored moment: a ghost drag teaches the gesture, once, then hands over
   function ghost(){
+    if(userTook) return;           // they got there first; do not touch their work
     size();
     if(W<80||H<80) return;         // the box is not real yet; the observer will call again
     if(reduce){ sel={x:W*.02,y:H*.705,w:W*.45,h:H*.055}; mode='editing';
@@ -790,7 +818,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     var box=document.getElementById('ascii'); if(!box) return;
     var grid=document.getElementById('asciiGrid'), img=document.getElementById('asciiImg'),
         win=document.getElementById('asciiWin'), ro=document.getElementById('asciiRo');
-    var RAMP=' .:-=+*#%@', COLS=96, ROWS=0, cellW=0, cellH=0, cells=null;
+    var RAMP=' .:-=+*#%@', COLS=62, ROWS=0, cellW=0, cellH=0, cells=null;
     var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
     var visible=false, t=0, last=0, raf=null;
 
@@ -836,8 +864,9 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
       var x=Math.round((( Math.sin(t*0.0042)+1)/2)*(w-sw)/cellW)*cellW;
       var y=Math.round((( Math.cos(t*0.0031)+1)/2)*(h-sh)/cellH)*cellH;
       img.style.clipPath='inset('+y+'px '+(w-x-sw)+'px '+(h-y-sh)+'px '+x+'px)';
-      win.style.cssText+=';left:'+x+'px;top:'+y+'px;width:'+sw+'px;height:'+sh+'px;opacity:1';
-      ro.style.cssText+=';left:'+x+'px;top:'+Math.max(0,y-13)+'px;opacity:1';
+      win.style.left=x+'px'; win.style.top=y+'px';
+      win.style.width=sw+'px'; win.style.height=sh+'px'; win.style.opacity=1;
+      ro.style.left=x+'px'; ro.style.top=Math.max(0,y-13)+'px'; ro.style.opacity=1;
       ro.textContent=Math.round(sw/w*1800)+' × '+Math.round(sh/h*1169);
     }
 
@@ -849,10 +878,13 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
       t++; place();
     }
 
+    var watching=false;
     function start(){
-      if(!build()) return;
+      if(!build()) return;                                // hidden or not decoded yet
       place();
       if(reduce) return;                                  // one still frame, no drift
+      if(watching) return;
+      watching=true;
       new IntersectionObserver(function(en){
         en.forEach(function(x){ visible=x.isIntersecting; });
       },{threshold:0}).observe(box);
@@ -861,11 +893,16 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
 
     if(img.complete && img.naturalWidth) start();
     else img.addEventListener('load',start);
-    if(window.ResizeObserver) new ResizeObserver(function(){ if(build()) place(); }).observe(box);
+    // display:none -> visible is a resize, and start() is what installs the loop
+    if(window.ResizeObserver) new ResizeObserver(function(){ start(); }).observe(box);
   })();
 
   // manifest - every number and every line comes from sync.py, never from hand
-  var D=window.SHOTTY, CHEV='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
+  var D=window.SHOTTY;
+  if(D&&D.regions){
+  var lay=document.getElementById('layoutLines');
+  if(lay&&D&&D.funcs) lay.textContent=D.funcs.layout;   // generated, never typed
+  var CHEV='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
     'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
   var out='';
   D.regions.forEach(function(r,i){
@@ -873,7 +910,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
       '<span class="nm">'+r.name+'</span>'+
       '<span class="rg">'+r.from+'–'+r.to+'</span>'+
       '<span class="ct">'+r.lines+'</span></button>'+
-      '<div class="src" id="src'+i+'" hidden><pre>'+r.html+'</pre></div>';
+      '<div class="src" id="src'+i+'" hidden><pre tabindex="0">'+r.html+'</pre></div>';
   });
   out+='<div class="total-row"><span></span><span class="nm">main.swift</span>'+
     '<span class="rg">1–'+D.fileLines+'</span><span class="ct">'+D.total+'</span></div>';
@@ -885,6 +922,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     b.setAttribute('aria-expanded',!open);
     document.getElementById(b.getAttribute('aria-controls')).hidden=open;
   });
+  }   // end if(D.regions): a missing source.js must not take the rest of the page with it
 
 
 
@@ -1018,7 +1056,8 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     });
 
     build();
-    addEventListener('resize',build);
+    var rt=null;
+    addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(build,120); });
 
     var played=false;
     new IntersectionObserver(function(en){
@@ -1035,7 +1074,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   // copy
   var btn=document.getElementById('copy-clone'), lbl=document.getElementById('clone-label');
   btn.addEventListener('click',function(){
-    var LABEL='git clone github.com/uuu4/shotty';   // never read back from the DOM
+    var LABEL='git clone https://github.com/uuu4/shotty.git';   // never read back from the DOM
     function restore(){ setTimeout(function(){ lbl.textContent=LABEL; },1900); }
     if(!navigator.clipboard){ lbl.textContent='clipboard blocked — copy it from Install below'; return restore(); }
     navigator.clipboard.writeText('git clone https://github.com/uuu4/shotty.git')
