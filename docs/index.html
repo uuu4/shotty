@@ -549,8 +549,8 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
 
   // the only correct factor between what is on screen and what would be copied
   function outScale(){
-    var w=document.getElementById('shot').getBoundingClientRect().width;
-    return w ? document.getElementById('shot').naturalWidth / w : 1;
+    var im=document.getElementById('shot'), w=im.getBoundingClientRect().width;
+    return (w && im.naturalWidth) ? im.naturalWidth / w : 0;   // 0 = not knowable yet
   }
 
   function draw(){
@@ -573,7 +573,8 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
 
     readout.style.opacity=1;
     var os=outScale();
-    readout.textContent=Math.round(sel.w*os)+' × '+Math.round(sel.h*os);
+    if(os){ readout.textContent=Math.round(sel.w*os)+' × '+Math.round(sel.h*os); }
+    else { readout.style.opacity=0; return; }   // never print a size we cannot know
     readout.style.left=sel.x+'px';
     readout.style.top=(sel.y>26? sel.y-24 : sel.y+sel.h+6)+'px';
   }
@@ -764,7 +765,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     arm();
   }
   var shotImg=document.getElementById('shot');
-  if(shotImg) shotImg.addEventListener('load',function(){ renderClip(); });
+  if(shotImg) shotImg.addEventListener('load',function(){ size(); draw(); renderClip(); });
   if(window.ResizeObserver) new ResizeObserver(sync).observe(screen);
   else addEventListener('resize',sync);
   sync();
@@ -805,6 +806,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   function arm(){
     if(armed || H<200) return;           // not a real box yet
     armed=true;
+    if(reduce){ seen=true; ghost(); return; }   // no animation to schedule, so do not wait
     new IntersectionObserver(function(en){
       en.forEach(function(x){ if(x.isIntersecting&&!seen){ seen=true; setTimeout(ghost,320); } });
     },{threshold:.35}).observe(screen);
@@ -1060,11 +1062,11 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(build,120); });
 
     var played=false;
-    new IntersectionObserver(function(en){
+    if(reduce){ step=2; apply(); }              // the resolved state, immediately
+    else new IntersectionObserver(function(en){
       en.forEach(function(x){
         if(!x.isIntersecting||played) return;
         played=true;
-        if(reduce){ step=2; apply(); return; }
         setTimeout(function(){ if(!took){ step=1; apply(); } },700);
         setTimeout(function(){ if(!took){ step=2; apply(); } },1750);
       });

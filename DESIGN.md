@@ -127,6 +127,12 @@ It samples once on load and on resize, drifts at ~14fps only while on screen and
 tab is visible, is hidden below 1000px, and holds one still frame under
 `prefers-reduced-motion`.
 
+**Reduced motion must never gate the content, only the motion.** Both interactive
+demonstrations used to wait for an `IntersectionObserver` before showing anything, including
+under `prefers-reduced-motion` — where there is no animation to schedule and therefore no
+reason to wait. A visitor with that preference got an empty screen and an OCR stage stuck on
+step one. They now render their resolved state at init and skip the observer entirely.
+
 Both interactive pieces cancel their teaching animation the moment the visitor touches them. A demonstration
 that fights the person trying it is worse than no demonstration.
 
