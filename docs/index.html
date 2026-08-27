@@ -1057,6 +1057,11 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
         d.style.transform='translateY('+(r*lh-lh*.06)+'px)';
         field.appendChild(d); bands.push(d);
       }
+      // below ~600px the font hits its 10px floor and the last columns fall outside
+      var pad=document.createElement('div');
+      pad.className='pad';
+      pad.style.width=(COLS*adv+28)+'px';
+      field.appendChild(pad);
       els=boxes.map(function(b,i){
         var e=document.createElement('span');
         e.className='frag'; e.style.fontSize=fs+'px'; e.textContent=b.s;
