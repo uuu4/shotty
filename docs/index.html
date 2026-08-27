@@ -435,27 +435,33 @@ verdict, DESIGN.md, and every shipping raster
     <noscript>
       <div class="cols stack">
         <div class="panel">
-          <div class="panel-head">the lit selection<b>412 &#215; 196</b></div>
-          <div class="panel-body">func schedule(_ items: [Item]) {
-    for item in items {
-        guard item.isReady else {
-            log.warn("skipping \(item.id)")
-            continue
+          <div class="panel-head">the lit selection<b>main.swift:366&#8211;377</b></div>
+          <div class="panel-body">    var text = &quot;&quot;
+    for p in row {
+        let col = Int((p.x / charW).rounded())           // column from the left edge
+        if col &gt; text.count {
+            text += String(repeating: &quot; &quot;, count: col - text.count)
+        } else if !text.isEmpty {
+            text += &quot; &quot;
         }
-        queue.append(item)
+        text += p.s
     }
+    out.append(text)
 }</div>
         </div>
         <div class="panel">
           <div class="panel-head">&#8984;R &#8594; your clipboard<b>plain text</b></div>
-          <div class="panel-body">func schedule(_ items: [Item]) {
-    for item in items {
-        guard item.isReady else {
-            log.warn("skipping \(item.id)")
-            continue
+          <div class="panel-body">    var text = &quot;&quot;
+    for p in row {
+        let col = Int((p.x / charW).rounded())           // column from the left edge
+        if col &gt; text.count {
+            text += String(repeating: &quot; &quot;, count: col - text.count)
+        } else if !text.isEmpty {
+            text += &quot; &quot;
         }
-        queue.append(item)
+        text += p.s
     }
+    out.append(text)
 }</div>
         </div>
       </div>
@@ -466,7 +472,7 @@ verdict, DESIGN.md, and every shipping raster
     <div class="cols stack">
       <p class="demo-note" style="margin:0">The column mapping above is that function ported to JS, running here on fragments that carry the noise Vision actually returns. It leaves out the paragraph-break pass, which this sample has nothing to exercise. Step through it yourself.</p>
       <div class="panel">
-        <div class="panel-head">⌘R → your clipboard<b>selectable text</b></div>
+        <div class="panel-head">⌘R → your clipboard<b id="ocrSrc">selectable text</b></div>
         <div class="panel-body" id="ocrOut" tabindex="0"></div>
       </div>
     </div>
@@ -488,6 +494,8 @@ verdict, DESIGN.md, and every shipping raster
 cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
           <li><b>Grant Screen Recording</b> on the first capture: System Settings → Privacy &amp; Security → Screen Recording. Then open it once more. Shotty lives in the menu bar as ✂︎, with no Dock icon. macOS 13 or later.</li>
         </ol>
+        <p class="demo-note">Or the whole of it in one line, once you have read what it runs:</p>
+        <code class="cmd" tabindex="0">git clone https://github.com/uuu4/shotty.git &amp;&amp; cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code>
       </div>
       <div>
         <h2>Keys</h2>
@@ -946,16 +954,9 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   // standing in for what Vision returns; the reconstruction itself is the real
   // algorithm, so if the port is wrong the third step visibly breaks.
   (function(){
-    var SAMPLE=[
-      'func schedule(_ items: [Item]) {',
-      '    for item in items {',
-      '        guard item.isReady else {',
-      '            log.warn("skipping \\(item.id)")',
-      '            continue',
-      '        }',
-      '        queue.append(item)',
-      '    }',
-      '}'];
+    // the demo reconstructs Shotty's own column-mapping loop, generated from main.swift
+    var D=window.SHOTTY;
+    var SAMPLE=(D&&D.sample)||['func schedule(_ items: [Item]) {','    queue.append(item)','}'];
     var field=document.getElementById('ocrField'), meta=document.getElementById('ocrMeta'),
         outEl=document.getElementById('ocrOut'), verdict=document.getElementById('ocrVerdict'),
         steps=document.getElementById('ocrSteps'), stage=document.getElementById('ocrStage');
@@ -1007,6 +1008,8 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     }
 
     var res=layout(boxes), adv=0, lh=0, bands=[];
+    var srcTag=document.getElementById('ocrSrc');
+    if(srcTag&&D&&D.sampleFrom) srcTag.textContent='main.swift:'+D.sampleFrom+'–'+D.sampleTo;
 
     function build(){
       field.innerHTML='';
