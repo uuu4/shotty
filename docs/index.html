@@ -346,7 +346,7 @@ verdict, DESIGN.md, and every shipping raster
 <section id="how" class="rule" style="padding-bottom:0">
   <div class="wrap">
     <h2>The gesture, on this page</h2>
-    <p class="sub">macOS captures first and lets you annotate afterwards, in a window that opens somewhere else once you catch a thumbnail before it expires. Shotty puts the drawing step where the selection already is. Below is that same interaction on a real screenshot: drag a box anywhere on it, then draw on what you want someone to look at.</p>
+    <p class="sub">macOS captures first and lets you annotate afterwards, in a window that opens somewhere else once you catch the thumbnail before it expires. Shotty puts the drawing step where the selection already is. Try it below, on a real screenshot.</p>
   </div>
 </section>
 
@@ -422,7 +422,7 @@ verdict, DESIGN.md, and every shipping raster
 <section id="ocr" class="rule">
   <div class="wrap">
     <h2>OCR that keeps the columns</h2>
-    <p class="sub">Vision returns recognized text as a bag of bounding boxes, so the straightforward implementation pastes back a flattened blob. Shotty estimates character width from the median box, maps every fragment back to a column, and reprints the block, so indentation, column gaps and paragraph breaks survive and a screenshot of code comes back as code. The whole OCR path is 80 lines; the column reconstruction itself is <code>Overlay.layout(_:)</code>, 44 of them.</p>
+    <p class="sub">Vision returns recognised text as a bag of bounding boxes, so the obvious implementation pastes back a flattened blob. Shotty estimates character width from the median box and maps every fragment to a column, so indentation and column gaps survive. That reconstruction is 44 lines, in <code>Overlay.layout(_:)</code>; the whole OCR path is 80.</p>
 
     <div class="stage" id="ocrStage">
       <div class="stage-head">
@@ -467,7 +467,7 @@ verdict, DESIGN.md, and every shipping raster
     </noscript>
 
     <div class="cols" style="margin-top:1.25rem">
-      <p class="demo-note" style="margin:0">This runs the real reconstruction in your browser, not a recording of it. The fragments carry the noise Vision actually returns, and the third step places every one of them using nothing but the median character width the algorithm derives from the boxes themselves. Nudge the steps yourself.</p>
+      <p class="demo-note" style="margin:0">This is that algorithm, ported to JS and running here on fragments that carry the noise Vision actually returns. Step through it yourself.</p>
       <div class="panel">
         <div class="panel-head">⌘R → your clipboard<b>selectable text</b></div>
         <div class="panel-body" id="ocrOut"></div>
