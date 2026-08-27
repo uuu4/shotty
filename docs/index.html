@@ -234,6 +234,11 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
 .keys td{padding:.6rem 0;border-bottom:1px solid var(--line);font-size:.95rem;vertical-align:top}
 .keys td:first-child{width:130px;white-space:nowrap}
 .keys td:last-child{color:var(--dim)}
+.keys.ns th{text-align:left;padding:.5rem 0;border-bottom:1px solid var(--line-2);
+  font-size:.8rem;font-weight:500;color:var(--faint)}
+.keys.ns td{font-family:var(--mono);font-size:.82rem;font-variant-numeric:tabular-nums}
+.keys.ns td:first-child{width:auto;font-family:var(--sans);font-size:.95rem;color:var(--text)}
+.keys.ns td:last-child,.keys.ns th:last-child{text-align:right}
 kbd{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI Symbol",var(--mono);font-size:.8rem;background:var(--bg-3);border:1px solid var(--line-2);
   border-bottom-width:2px;border-radius:5px;padding:.15em .45em;color:var(--text);white-space:nowrap
@@ -351,7 +356,7 @@ verdict, DESIGN.md, and every shipping raster
       <img id="shot" draggable="false" loading="lazy" decoding="async" src="shot.webp" width="1800" height="1169" alt="A screenshot of a video page, used here as something to select and mark up">
       <svg id="ovl" aria-hidden="true"></svg>
       <div class="readout" id="readout"></div>
-      <div class="hint" id="hint">Drag anywhere on this screen<br><span style="color:var(--faint);font-size:.82em">or focus it and press Enter</span></div>
+      <div class="hint" id="hint" hidden></div>
       <div class="bar" id="bar" role="toolbar" aria-label="Annotation tools">
         <button class="tool" data-tool="pen" aria-pressed="true" title="Pen (P)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/></svg></button>
         <button class="tool" data-tool="rect" aria-pressed="false" title="Rectangle (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/></svg></button>
@@ -368,6 +373,10 @@ verdict, DESIGN.md, and every shipping raster
         <button class="tool" id="reset" title="Start over (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
     </div>
+    <noscript><p class="demo-note">With JavaScript on this screen is live: you drag a box on it,
+      everything outside dims, and you draw inside the box before anything is copied. Every key it
+      demonstrates is written out in the table further down, and the source of all of it is in
+      <code>main.swift</code>.</p></noscript>
     <div class="cols" style="margin-top:1.15rem">
       <p class="demo-note" style="margin:0">In the app the same toolbar carries Copy, Save and OCR, and the keys are <kbd>P</kbd> <kbd>R</kbd> <kbd>A</kbd> <kbd>H</kbd> for the tools, <kbd>⌘C</kbd> to copy the lit region, <kbd>⌘R</kbd> to read its text. Drag outside your selection to start a new one.</p>
       <div class="panel">
@@ -384,6 +393,29 @@ verdict, DESIGN.md, and every shipping raster
     <p class="sub">This is the whole program. Not the interesting parts of it, not a summary. All of it, grouped by what each region does. Open any row to read it right here, and check the line
       range against the file yourself. If it ever reaches four digits, the argument on this page stops being true and you should hold me to that.</p>
     <div class="manifest" id="manifest"></div>
+    <!--manifest-noscript-->
+    <noscript>
+      <p class="demo-note" style="margin-bottom:1rem">This table is normally built in your browser
+        from <code>main.swift</code>, and each row opens the source it counts. With JavaScript off,
+        here are the same numbers as plain text &#8212; and <code>wc -l main.swift</code> checks them
+        without trusting this page at all.</p>
+      <table class="keys ns">
+        <tr><th>Region</th><th>Lines</th><th>Code</th></tr>
+        <tr><td>Imports and settings</td><td>1&#8211;14</td><td>11</td></tr>
+        <tr><td>Overlay state and init</td><td>15&#8211;44</td><td>23</td></tr>
+        <tr><td>Drawing the overlay</td><td>45&#8211;131</td><td>74</td></tr>
+        <tr><td>Mouse: select and annotate</td><td>132&#8211;179</td><td>43</td></tr>
+        <tr><td>Keyboard</td><td>180&#8211;203</td><td>22</td></tr>
+        <tr><td>Toolbar</td><td>204&#8211;262</td><td>52</td></tr>
+        <tr><td>Export: copy and save</td><td>263&#8211;287</td><td>22</td></tr>
+        <tr><td>OCR</td><td>288&#8211;382</td><td>80</td></tr>
+        <tr><td>Window and capture</td><td>383&#8211;431</td><td>40</td></tr>
+        <tr><td>Global hotkey</td><td>432&#8211;439</td><td>7</td></tr>
+        <tr><td>App and launch</td><td>440&#8211;459</td><td>19</td></tr>
+        <tr><td><b>main.swift</b></td><td>1&#8211;459</td><td><b>393</b></td></tr>
+      </table>
+    </noscript>
+    <!--/manifest-noscript-->
   </div>
 </section>
 
@@ -403,6 +435,36 @@ verdict, DESIGN.md, and every shipping raster
       </div>
       <div class="field" id="ocrField"></div>
     </div>
+    <noscript>
+      <div class="cols" style="margin-top:1.25rem">
+        <div class="panel">
+          <div class="panel-head">the lit selection<b>412 &#215; 196</b></div>
+          <div class="panel-body">func schedule(_ items: [Item]) {
+    for item in items {
+        guard item.isReady else {
+            log.warn("skipping \(item.id)")
+            continue
+        }
+        queue.append(item)
+    }
+}</div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">&#8984;R &#8594; your clipboard<b>plain text</b></div>
+          <div class="panel-body">func schedule(_ items: [Item]) {
+    for item in items {
+        guard item.isReady else {
+            log.warn("skipping \(item.id)")
+            continue
+        }
+        queue.append(item)
+    }
+}</div>
+        </div>
+      </div>
+      <p class="demo-note">Character for character, column for column. With JavaScript on, the
+        reconstruction above runs in your browser and checks that identity itself.</p>
+    </noscript>
 
     <div class="cols" style="margin-top:1.25rem">
       <p class="demo-note" style="margin:0">This runs the real reconstruction in your browser, not a recording of it. The fragments carry the noise Vision actually returns, and the third step places every one of them using nothing but the median character width the algorithm derives from the boxes themselves. Nudge the steps yourself.</p>
@@ -476,6 +538,9 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
       readout=document.getElementById('readout');
   var W=0,H=0,mode='idle',sel=null,start=null,tool='pen',color='#E5484D',strokes=[],cur=null,userTook=false;
   var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  hint.hidden=false;
+  hint.innerHTML='Drag anywhere on this screen<br><span style="color:var(--faint);font-size:.82em">or focus it and press Enter</span>';
 
   function size(){ var r=ovl.getBoundingClientRect(); W=r.width; H=r.height;
     // viewBox only: writing width/height attributes pins the element to its own
