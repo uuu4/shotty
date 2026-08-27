@@ -10,16 +10,16 @@
 <meta property="og:url" content="https://uuu4.github.io/shotty/">
 <meta property="og:title" content="Shotty — a screenshot tool you can read before you run it">
 <meta property="og:description" content="393 lines of Swift. Freeze the screen, select a region, draw on it before it is copied anywhere, and OCR it with the indentation intact. No dependencies, no account, no network calls.">
-<meta property="og:image" content="https://uuu4.github.io/shotty/og.png">
+<meta property="og:image" content="https://uuu4.github.io/shotty/og.png?v=e3b7d689">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Shotty — 393 lines of Swift, 1 file, 0 dependencies, 0 network calls.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://uuu4.github.io/shotty/og.png">
+<meta name="twitter:image" content="https://uuu4.github.io/shotty/og.png?v=e3b7d689">
 <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="theme-color" content="#111110">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon.svg?v=c6e6922a" type="image/svg+xml">
 <style>
 /* self-hosted: a page whose thesis is "no network calls" does not call a font CDN */
 @font-face{font-family:"Archivo";src:url(fonts/archivo.woff2) format("woff2-variations");
@@ -338,7 +338,7 @@ verdict, DESIGN.md, and every shipping raster
    </div>
    <div class="ascii" id="ascii" aria-hidden="true">
      <pre id="asciiGrid"></pre>
-     <img id="asciiImg" src="shot-sm.webp" alt="" draggable="false" fetchpriority="high">
+     <img id="asciiImg" src="shot-sm.webp?v=83f7739a" alt="" draggable="false" fetchpriority="high">
      <div id="asciiWin"></div>
      <span id="asciiRo"></span>
    </div>
@@ -350,7 +350,7 @@ verdict, DESIGN.md, and every shipping raster
     <h2>The gesture, on this page</h2>
     <p class="sub">macOS captures first and lets you annotate afterwards, in a window that opens somewhere else once you catch the thumbnail before it expires. Shotty puts the drawing step where the selection already is. Try it below, on a real screenshot.</p>
     <div class="screen" id="screen" tabindex="0" aria-label="Optional demo of the capture gesture. Press Enter to place a selection, then the arrow keys to move it and P, R, A or H to switch tools.">
-      <img id="shot" draggable="false" loading="lazy" decoding="async" src="shot.webp" width="1800" height="1169" alt="A screenshot of a video page, used here as something to select and mark up">
+      <img id="shot" draggable="false" loading="lazy" decoding="async" src="shot.webp?v=9c96aaa4" width="1800" height="1169" alt="A screenshot of a video page, used here as something to select and mark up">
       <svg id="ovl" aria-hidden="true"></svg>
       <div class="readout" id="readout"></div>
       <div class="hint" id="hint" hidden></div>
@@ -834,7 +834,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   }
 
   // ── the hero field: the demo screenshot, sampled into characters ──
-  // Not a decorative noise field. Every glyph is one cell of shot.webp, picked by
+  // Not a decorative noise field. Every glyph is one cell of shot.webp?v=9c96aaa4, picked by
   // luminance, so what you see is the screenshot. The drifting window is the app's
   // own gesture: outside is the dim render, inside is what you actually selected.
   (function(){
