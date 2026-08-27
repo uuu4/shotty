@@ -55,14 +55,20 @@ nav .links a{transition:color .18s}
 nav .links a:hover{color:var(--text)}
 
 /* hero */
-header .wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:clamp(2rem,5vw,4rem);align-items:center}
+header .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,40%);gap:clamp(1.5rem,4vw,3.5rem);align-items:center}
 /* grid items default to min-width:auto, so any white-space:pre child (a command,
    a terminal block, a table) widens the track past the viewport. Pin them to 0. */
 .hero-copy,.cols>*,footer .cols2>*{min-width:0}
-.ascii{font-family:var(--mono);font-size:10px;line-height:1.18;letter-spacing:.06em;
-  white-space:pre;margin:0;user-select:none;color:var(--line-2)}
-.ascii .lit{color:var(--text)}
-.ascii .edge{color:var(--mark)}
+.ascii{position:relative;aspect-ratio:1800/1169;width:100%;overflow:hidden;
+  border-radius:6px;background:var(--bg);margin-right:calc(var(--pad) * -1)}
+#asciiGrid{position:absolute;inset:0;margin:0;font-family:var(--mono);white-space:pre;
+  color:#767267;letter-spacing:0;user-select:none}
+#asciiImg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;
+  clip-path:inset(100% 0 0 0);user-select:none}
+#asciiWin{position:absolute;border:1px solid var(--mark);border-radius:1px;opacity:0}
+#asciiRo{position:absolute;font-family:var(--mono);font-size:9px;letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;color:var(--text);background:rgba(11,11,10,.9);
+  padding:1px 4px;border-radius:2px;opacity:0}
 @media (max-width:1000px){header .wrap{grid-template-columns:1fr}.ascii{display:none}}
 
 header{padding:clamp(4rem,11vw,7.5rem) 0 clamp(2.5rem,5vw,3.5rem)}
@@ -290,7 +296,12 @@ verdict, DESIGN.md, and every shipping raster
     </div>
     <p class="proof-note">Those three commands are the entire pitch. Run them before you run anything else.</p>
    </div>
-   <pre class="ascii" id="ascii" aria-hidden="true"></pre>
+   <div class="ascii" id="ascii" aria-hidden="true">
+     <pre id="asciiGrid"></pre>
+     <img id="asciiImg" src="shot.webp" alt="" draggable="false">
+     <div id="asciiWin"></div>
+     <span id="asciiRo"></span>
+   </div>
   </div>
 </header>
 
@@ -610,57 +621,86 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     },{threshold:.35}).observe(screen);
   }
 
-  // ── ambient ascii: the product's own mechanic, drawn in characters ──
+  // ── the hero field: the demo screenshot, sampled into characters ──
+  // Not a decorative noise field. Every glyph is one cell of shot.webp, picked by
+  // luminance, so what you see is the screenshot. The drifting window is the app's
+  // own gesture: outside is the dim render, inside is what you actually selected.
   (function(){
-    var el=document.getElementById('ascii'); if(!el) return;
-    var COLS=44, ROWS=26, RAMP=' .:-=+*#%@', t=0, raf=null, visible=false;
+    var box=document.getElementById('ascii'); if(!box) return;
+    var grid=document.getElementById('asciiGrid'), img=document.getElementById('asciiImg'),
+        win=document.getElementById('asciiWin'), ro=document.getElementById('asciiRo');
+    var RAMP=' .:-=+*#%@', COLS=96, ROWS=0, cellW=0, cellH=0, cells=null;
+    var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var visible=false, t=0, last=0, raf=null;
 
-    function frame(){
-      // two drifting fields; luminance picks the glyph, exactly like a ramp render
-      var sel={x:4+Math.sin(t*0.011)*3.4, y:5+Math.cos(t*0.009)*3.2, w:24, h:11};
-      sel.x=Math.round(sel.x); sel.y=Math.round(sel.y);
+    function build(){
+      var w=box.clientWidth, h=box.clientHeight;
+      if(!w||!h||!img.naturalWidth) return false;
+      cellW=w/COLS;
+      ROWS=Math.max(8,Math.round(h/(cellW*1.9)));
+      cellH=h/ROWS;
+      grid.style.fontSize=(cellW/0.6008)+'px';
+      grid.style.lineHeight=cellH+'px';
+
+      var c=document.createElement('canvas'); c.width=COLS; c.height=ROWS;
+      var ctx=c.getContext('2d',{willReadFrequently:true});
+      ctx.drawImage(img,0,0,COLS,ROWS);
+      var d;
+      try { d=ctx.getImageData(0,0,COLS,ROWS).data; } catch(e){ return false; }
+
+      var lum=new Float32Array(COLS*ROWS), lo=1, hi=0;
+      for(var i=0;i<COLS*ROWS;i++){
+        var v=(0.2126*d[i*4]+0.7152*d[i*4+1]+0.0722*d[i*4+2])/255;
+        lum[i]=v; if(v<lo)lo=v; if(v>hi)hi=v;
+      }
+      var span=Math.max(hi-lo,0.001);
       var rows=[];
       for(var r=0;r<ROWS;r++){
         var line='';
-        for(var c=0;c<COLS;c++){
-          var v=Math.sin(c*0.29+t*0.024)*Math.cos(r*0.42-t*0.017)
-               +Math.sin((c*0.13+r*0.21)+t*0.011);
-          var n=(v+2)/4;                                  // 0..1
-          line+=RAMP[Math.max(0,Math.min(RAMP.length-1,Math.round(n*(RAMP.length-1))))];
+        for(var cx=0;cx<COLS;cx++){
+          var n=(lum[r*COLS+cx]-lo)/span;                 // stretch, or a dark UI is all spaces
+          line+=RAMP[Math.min(RAMP.length-1,Math.max(0,Math.round(n*(RAMP.length-1))))];
         }
-        var inside = r>=sel.y && r<sel.y+sel.h;
-        if(!inside){ rows.push(esc(line)); continue; }
-        var a=line.slice(0,sel.x), z=line.slice(sel.x+sel.w), b;
-        if(r===sel.y||r===sel.y+sel.h-1){
-          var h=Array(sel.w-1).join('─');
-          b=(r===sel.y?'┌'+h+'┐':'└'+h+'┘');
-          rows.push(esc(a)+'<span class="edge">'+b+'</span>'+esc(z));
-        } else {
-          b=line.slice(sel.x+1,sel.x+sel.w-1);
-          rows.push(esc(a)+'<span class="edge">│</span>'+
-                    '<span class="lit">'+esc(b)+'</span>'+
-                    '<span class="edge">│</span>'+esc(z));
-        }
+        rows.push(line);
       }
-      el.innerHTML=rows.join('\n');
-      t++;
+      cells=rows.join('\n');
+      grid.textContent=cells;
+      return true;
     }
-    function esc(x){ return x.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
-    var last=0;
+    function place(){
+      var w=box.clientWidth, h=box.clientHeight;
+      // a slow drift, deterministic so every reader sees the same pass
+      var sw=Math.round(COLS*0.34)*cellW, sh=Math.round(ROWS*0.30)*cellH;
+      var x=Math.round((( Math.sin(t*0.0042)+1)/2)*(w-sw)/cellW)*cellW;
+      var y=Math.round((( Math.cos(t*0.0031)+1)/2)*(h-sh)/cellH)*cellH;
+      img.style.clipPath='inset('+y+'px '+(w-x-sw)+'px '+(h-y-sh)+'px '+x+'px)';
+      win.style.cssText+=';left:'+x+'px;top:'+y+'px;width:'+sw+'px;height:'+sh+'px;opacity:1';
+      ro.style.cssText+=';left:'+x+'px;top:'+Math.max(0,y-13)+'px;opacity:1';
+      ro.textContent=Math.round(sw/w*1800)+' × '+Math.round(sh/h*1169);
+    }
+
     function loop(ts){
       raf=requestAnimationFrame(loop);
-      if(ts-last<83) return;                              // ~12fps is plenty
+      if(ts-last<70) return;                              // ~14fps, it is a drift
       last=ts;
-      if(!visible||document.hidden) return;
-      frame();
+      if(!visible||document.hidden||!cells) return;
+      t++; place();
     }
-    frame();
-    if(reduce) return;                                    // one still frame, no loop
-    new IntersectionObserver(function(en){
-      en.forEach(function(x){ visible=x.isIntersecting; });
-    },{threshold:0}).observe(el);
-    raf=requestAnimationFrame(loop);
+
+    function start(){
+      if(!build()) return;
+      place();
+      if(reduce) return;                                  // one still frame, no drift
+      new IntersectionObserver(function(en){
+        en.forEach(function(x){ visible=x.isIntersecting; });
+      },{threshold:0}).observe(box);
+      if(!raf) raf=requestAnimationFrame(loop);
+    }
+
+    if(img.complete && img.naturalWidth) start();
+    else img.addEventListener('load',start);
+    if(window.ResizeObserver) new ResizeObserver(function(){ if(build()) place(); }).observe(box);
   })();
 
   // manifest - every number and every line comes from sync.py, never from hand

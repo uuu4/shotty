@@ -95,11 +95,20 @@ future one has to pass.
    asserts the output equals the input and says so — **if the port is ever wrong, the page
    says so out loud instead of lying.**
 
-Plus one ambient piece, held to the same test: the hero's ASCII field is the product's own
-mechanic drawn in characters — a selection rectangle drifting over a luminance ramp, lit
-inside, dim outside. It is the world of the "ASCII Live Render" direction the roll declined,
-kept as ambience rather than as the page's identity. It runs at 12fps, only while on screen
-and only while the tab is visible, is hidden below 1000px, and renders one still frame under
+Plus one ambient piece, held to the same test. The hero field is **the demo screenshot
+itself**, sampled into a 96-column glyph grid by luminance with the range stretched (a dark
+UI otherwise samples to nothing but spaces). A selection window drifts across it, and inside
+the window the real image shows through with a live pixel readout — the app's dim/lit gesture
+and the page's pixels-become-characters thesis in one object. It is the world of the "ASCII
+Live Render" direction the roll declined, kept as ambience rather than as the page's identity.
+
+The first version of this was a plasma noise field with a box on it. It passed no test; it
+was decoration wearing the argument's clothes, and the owner called it. **If the field ever
+stops being a picture of something real, delete it rather than tuning it.** One moving
+element is the budget: the drift plus the readout. A second would put it back in decoration.
+
+It samples once on load and on resize, drifts at ~14fps only while on screen and while the
+tab is visible, is hidden below 1000px, and holds one still frame under
 `prefers-reduced-motion`.
 
 Both interactive pieces cancel their teaching animation the moment the visitor touches them. A demonstration
