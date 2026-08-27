@@ -288,8 +288,9 @@ final class Overlay: NSView {
     @objc func runOCR() {
         guard var cg = render()?.cgImage else { return }
         flash("Running OCR…")
-        // Vision struggles below ~20px text height, so upscale small selections first
-        if cg.height < 700 { cg = upscale(cg, 2) }
+        // Vision struggles below ~20px text height, and thin glyphs like _ drop out entirely.
+        // Scale up to a height floor rather than a fixed 2x, so a small crop gets more.
+        if cg.height < 1200 { cg = upscale(cg, min(4, max(2, Int((1200.0 / Double(cg.height)).rounded(.up))))) }
 
         let req = VNRecognizeTextRequest { [weak self] r, _ in
             let obs = r.results as? [VNRecognizedTextObservation] ?? []
@@ -336,6 +337,10 @@ final class Overlay: NSView {
         }
         guard !pieces.isEmpty else { return "" }
 
+        // column 0 is the leftmost glyph, not the crop edge — otherwise a few px of
+        // margin adds a phantom space to every single line
+        let x0 = pieces.map { $0.x }.min() ?? 0
+
         // ponytail: character width is estimated from the median; exact for a single font,
         // indentation can drift by a space when one shot mixes very different sizes
         let ws = pieces.filter { $0.s.count > 2 }.map { $0.w / CGFloat($0.s.count) }.sorted()
@@ -365,7 +370,7 @@ final class Overlay: NSView {
             prevY = first.y
             var text = ""
             for p in row {
-                let col = Int((p.x / charW).rounded())           // column from the left edge
+                let col = Int(((p.x - x0) / charW).rounded())    // column from the leftmost glyph
                 if col > text.count {
                     text += String(repeating: " ", count: col - text.count)
                 } else if !text.isEmpty {

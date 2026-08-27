@@ -3,11 +3,11 @@
 **[uuu4.github.io/shotty](https://uuu4.github.io/shotty/)** — try the capture gesture and
 watch the OCR reconstruction run, without installing anything.
 
-**An open source, 393-line screenshot tool for macOS.** Capture a region, draw on it, copy
+**An open source, 394-line screenshot tool for macOS.** Capture a region, draw on it, copy
 it — or OCR it with the indentation intact. Small enough to read before you run it.
 
 ```bash
-wc -l main.swift                  # 459 lines, 393 of them code
+wc -l main.swift                  # 464 lines, 394 of them code
 grep -c 'URLSession\|http' main.swift   # 0 — there is no network code
 ```
 

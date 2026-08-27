@@ -18,17 +18,17 @@ REGIONS = [
     ("Keyboard",                  180, 203),
     ("Toolbar",                   204, 262),
     ("Export: copy and save",     263, 287),
-    ("OCR",                       288, 382),
-    ("Window and capture",        383, 431),
-    ("Global hotkey",             432, 439),
-    ("App and launch",            440, 459),
+    ("OCR",                       288, 387),
+    ("Window and capture",        388, 436),
+    ("Global hotkey",             437, 444),
+    ("App and launch",            445, 464),
 ]
 
 # numbers the page quotes in prose; generated so they cannot be hand-typed wrong
-FUNCS = {"layout": (330, 379, "func layout")}
+FUNCS = {"layout": (331, 384, "func layout")}
 
 # the OCR demo reconstructs the very loop that does the reconstruction
-SAMPLE = (366, 377)
+SAMPLE = (371, 382)
 
 KW = {"var","let","for","in","if","else","guard","return","func","static","struct",
       "continue","nil","true","false","enum","class","final","import","case","switch",
@@ -178,6 +178,15 @@ def _rewrite_noscript(regions, total, file_lines):
     s = s[:a] + block + s[b:]
     io.open(page, "w", encoding="utf-8").write(s)
     print("index.html: noscript table refreshed")
+
+    # the social card states the same number; rewrite it here so it cannot drift
+    og = os.path.join(HERE, "og.html")
+    if os.path.exists(og):
+        t = open(og).read()
+        t2 = re.sub(r'<b>\d+</b> lines of Swift', "<b>%d</b> lines of Swift" % total, t)
+        if t2 != t:
+            open(og, "w").write(t2)
+            print("og.html: line count updated — regenerate og.png (command in that file)")
 
 
 if __name__ == "__main__":

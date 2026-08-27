@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Shotty — a screenshot tool you can read before you run it</title>
-<meta name="description" content="An open source screenshot tool for macOS in 393 lines of Swift. Freeze the screen, select a region, draw on it before it is copied anywhere, and OCR it with the indentation intact.">
+<meta name="description" content="An open source screenshot tool for macOS in 394 lines of Swift. Freeze the screen, select a region, draw on it before it is copied anywhere, and OCR it with the indentation intact.">
 <link rel="canonical" href="https://uuu4.github.io/shotty/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://uuu4.github.io/shotty/">
 <meta property="og:title" content="Shotty — a screenshot tool you can read before you run it">
-<meta property="og:description" content="393 lines of Swift. Freeze the screen, select a region, draw on it before it is copied anywhere, and OCR it with the indentation intact. No dependencies, no account, no network calls.">
-<meta property="og:image" content="https://uuu4.github.io/shotty/og.png?v=e3b7d689">
+<meta property="og:description" content="394 lines of Swift. Freeze the screen, select a region, draw on it before it is copied anywhere, and OCR it with the indentation intact. No dependencies, no account, no network calls.">
+<meta property="og:image" content="https://uuu4.github.io/shotty/og.png?v=08032658">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Shotty — 393 lines of Swift, 1 file, 0 dependencies, 0 network calls.">
+<meta property="og:image:alt" content="Shotty — 394 lines of Swift, 1 file, 0 dependencies, 0 network calls.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://uuu4.github.io/shotty/og.png?v=e3b7d689">
+<meta name="twitter:image" content="https://uuu4.github.io/shotty/og.png?v=08032658">
 <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="theme-color" content="#111110">
@@ -68,7 +68,7 @@ nav{position:sticky;top:0;z-index:40;background:rgba(17,17,16,.85);backdrop-filt
 nav .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
 .brand{display:flex;align-items:center;gap:.55rem;font-weight:600;letter-spacing:-.018em;font-size:1.02rem}
 /* the mark is the product's actual signature: selection corners around one lit region.
-   Monochrome on purpose — --mark stays reserved, and the 393 keeps the only red above the fold. */
+   Monochrome on purpose — --mark stays reserved, and the 394 keeps the only red above the fold. */
 .brand .mark{width:21px;height:21px;flex:none;color:var(--text)}
 .brand .mark path{transition:opacity .18s}
 .brand:hover .mark path{opacity:.9}
@@ -305,7 +305,7 @@ verdict, DESIGN.md, and every shipping raster
     <a class="brand" href="#top"><svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9V5.6A1.6 1.6 0 014.6 4H7M17 4h2.8A1.6 1.6 0 0121 5.6V7M21 17v2.8a1.6 1.6 0 01-1.6 1.6H17M7 20H4.6A1.6 1.6 0 013 18.4V17" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" opacity=".6"/><rect x="6.8" y="8.4" width="8.4" height="5.2" rx="1" fill="currentColor"/></svg><span>Shotty</span></a>
     <div class="links">
       <a href="#how" data-hide>How it works</a>
-      <a href="#lines">393 lines</a>
+      <a href="#lines">394 lines</a>
       <a href="#ocr" data-hide>OCR</a>
       <a href="#install">Install</a>
       <a href="https://github.com/uuu4/shotty">GitHub</a>
@@ -332,9 +332,9 @@ verdict, DESIGN.md, and every shipping raster
     <div class="proof">
       <div class="proof-head">verify it yourself</div>
       <div class="proof-body" tabindex="0" role="group" aria-label="Verification commands"><span class="p">$ </span><span class="c">wc -l main.swift</span>
-<span class="o">     459 main.swift</span>
+<span class="o">     464 main.swift</span>
 <span class="p">$ </span><span class="c">grep -vc '^[[:space:]]*$\|^[[:space:]]*//' main.swift</span>
-<span class="n">393</span><span class="o">   # lines that are actually code</span>
+<span class="n">394</span><span class="o">   # lines that are actually code</span>
 <span class="p">$ </span><span class="c">grep -c 'URLSession\|http' main.swift</span>
 <span class="n">0</span><span class="o">     # there is no network code</span></div>
     </div>
@@ -393,7 +393,7 @@ verdict, DESIGN.md, and every shipping raster
     <h2>Every line, accounted for</h2>
     <p class="sub">This is the whole program. Not the interesting parts of it, not a summary. All of it, grouped by what each region does. Open any row to read it right here, and check the line
       range against the file yourself. If it ever reaches four digits, the argument on this page stops being true and you should hold me to that.</p>
-    <div class="manifest" id="manifest" data-bodies="source-bodies.js?v=35ab5d29"></div>
+    <div class="manifest" id="manifest" data-bodies="source-bodies.js?v=3d7ddeff"></div>
     <!--manifest-noscript-->
     <noscript>
       <p class="demo-note" style="margin-bottom:1rem">This table is normally built in your browser
@@ -409,11 +409,11 @@ verdict, DESIGN.md, and every shipping raster
         <tr><td>Keyboard</td><td>180&#8211;203</td><td>22</td></tr>
         <tr><td>Toolbar</td><td>204&#8211;262</td><td>52</td></tr>
         <tr><td>Export: copy and save</td><td>263&#8211;287</td><td>22</td></tr>
-        <tr><td>OCR</td><td>288&#8211;382</td><td>80</td></tr>
-        <tr><td>Window and capture</td><td>383&#8211;431</td><td>40</td></tr>
-        <tr><td>Global hotkey</td><td>432&#8211;439</td><td>7</td></tr>
-        <tr><td>App and launch</td><td>440&#8211;459</td><td>19</td></tr>
-        <tr><td><b>main.swift</b></td><td>1&#8211;459</td><td><b>393</b></td></tr>
+        <tr><td>OCR</td><td>288&#8211;387</td><td>81</td></tr>
+        <tr><td>Window and capture</td><td>388&#8211;436</td><td>40</td></tr>
+        <tr><td>Global hotkey</td><td>437&#8211;444</td><td>7</td></tr>
+        <tr><td>App and launch</td><td>445&#8211;464</td><td>19</td></tr>
+        <tr><td><b>main.swift</b></td><td>1&#8211;464</td><td><b>394</b></td></tr>
       </table>
     </noscript>
     <!--/manifest-noscript-->
@@ -525,7 +525,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
       <p><b>Not doing:</b> a text tool, resize handles, upload links, history, cloud sync, an
         updater, analytics. Each one costs lines, and the line count is the argument.</p>
       <p class="by">Built by <a href="https://github.com/uuu4">uuu4</a>. MIT licensed — fork it,
-        change the keybinding, ship your own. Every change to the 393 lines is in the
+        change the keybinding, ship your own. Every change to the 394 lines is in the
         <a href="https://github.com/uuu4/shotty/commits/main">commit log</a>; there is no
         release cadence to trust, only a diff to read.</p>
     </div>
@@ -538,7 +538,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   </div>
 </footer>
 
-<script src="source.js?v=cc0e0eca"></script>
+<script src="source.js?v=c5347e0e"></script>
 <script>
 (function(){
   var NS='http://www.w3.org/2000/svg';

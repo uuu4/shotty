@@ -37,7 +37,7 @@ noticing that they are on macOS.
 
 ## Positioning
 
-**Auditable smallness.** 393 lines of code in one Swift file (459 with comments
+**Auditable smallness.** 394 lines of code in one Swift file (464 with comments
 and blanks), no dependencies, no build system, and zero network calls — both
 numbers verifiable in one shell command, which is the pitch itself. Every
 competitor on this platform is a closed binary; this one can be read before it is
@@ -95,7 +95,7 @@ DESIGN.md instead.
 
 ## Evidence on Hand
 
-Real and verifiable, in order of persuasive weight: 393 lines of code / 459 total
+Real and verifiable, in order of persuasive weight: 394 lines of code / 464 total
 (`wc -l main.swift`); zero network calls (`grep -c 'URLSession\|http' main.swift`
 returns 0); the source at `main.swift`; the public repo at github.com/uuu4/shotty;
 the MIT license. The two shell commands are evidence a visitor can run, which is
