@@ -6,6 +6,11 @@ watch the OCR reconstruction run, without installing anything.
 **An open source, 394-line screenshot tool for macOS.** Capture a region, draw on it, copy
 it — or OCR it with the indentation intact. Small enough to read before you run it.
 
+![Selecting code inside a paused video and pasting it into an editor, indentation intact](docs/demo.gif)
+
+*OCR run: a code snippet inside a video — text you cannot select — lifted into an editor
+with its indentation preserved.*
+
 ```bash
 wc -l main.swift                  # 464 lines, 394 of them code
 grep -c 'URLSession\|http' main.swift   # 0 — there is no network code
