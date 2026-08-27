@@ -16,6 +16,9 @@
 <meta property="og:image:alt" content="Shotty — 393 lines of Swift, 1 file, 0 dependencies, 0 network calls.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://uuu4.github.io/shotty/og.png">
+<link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+<meta name="theme-color" content="#111110">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <style>
 /* self-hosted: a page whose thesis is "no network calls" does not call a font CDN */
@@ -310,7 +313,7 @@ verdict, DESIGN.md, and every shipping raster
    </div>
    <div class="ascii" id="ascii" aria-hidden="true">
      <pre id="asciiGrid"></pre>
-     <img id="asciiImg" src="shot.webp" alt="" draggable="false">
+     <img id="asciiImg" src="shot-sm.webp" alt="" draggable="false" fetchpriority="high">
      <div id="asciiWin"></div>
      <span id="asciiRo"></span>
    </div>
@@ -328,7 +331,7 @@ verdict, DESIGN.md, and every shipping raster
 <section id="demo-sec">
   <div class="wrap">
     <div class="screen" id="screen" tabindex="0" role="application" aria-label="Optional demo of the capture gesture. Press Enter to place a selection, then P, R, A or H to switch tools. Everything it demonstrates is written out in the Keys table further down.">
-      <img id="shot" draggable="false" src="shot.webp" width="1800" height="1169" alt="A screenshot of a video page, used here as something to select and mark up">
+      <img id="shot" draggable="false" loading="lazy" decoding="async" src="shot.webp" width="1800" height="1169" alt="A screenshot of a video page, used here as something to select and mark up">
       <svg id="ovl" aria-hidden="true"></svg>
       <div class="readout" id="readout"></div>
       <div class="hint" id="hint">Drag anywhere on this screen<br><span style="color:var(--faint);font-size:.82em">or focus it and press Enter</span></div>
