@@ -1,6 +1,7 @@
 # Shotty
 
-**[uuu4.github.io/shotty](https://uuu4.github.io/shotty/)**
+**[uuu4.github.io/shotty](https://uuu4.github.io/shotty/)** — try the capture gesture and
+watch the OCR reconstruction run, without installing anything.
 
 **An open source, 393-line screenshot tool for macOS.** Capture a region, draw on it, copy
 it — or OCR it with the indentation intact. Small enough to read before you run it.
