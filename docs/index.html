@@ -108,79 +108,32 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
   background:#0B0B0A;overflow:hidden;box-shadow:0 24px 60px -20px rgba(0,0,0,.75);
   touch-action:none;user-select:none;cursor:crosshair;
 }
-.screen-bar{display:flex;align-items:center;gap:.5rem;height:36px;padding:0 .85rem;background:var(--bg-3);border-bottom:1px solid var(--line)}
-.dot{width:11px;height:11px;border-radius:50%;background:#3A3833}
-
-.screen-title{font-family:var(--mono);font-size:.74rem;color:var(--faint)}
-/* the demo surface: an authored, unbranded app screen, light so the dim reads */
-.ui{background:#F7F6F3;color:#1B1A17;padding:1.1rem 1.2rem 1.3rem;font-size:clamp(.72rem,1.1vw,.84rem)}
-.ui-h{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;
-  padding-bottom:.7rem;margin-bottom:.35rem;border-bottom:1px solid #E2DFD8}
-.ui-t{font-weight:600;letter-spacing:-.01em}
-.ui-s{font-family:var(--mono);font-size:.86em;color:#6F6B62}
-.ck{display:grid;grid-template-columns:16px minmax(0,1fr) auto;align-items:center;gap:.7rem;
-  padding:.52rem 0;border-bottom:1px solid #EDEAE3}
-.ck i{width:11px;height:11px;border-radius:50%;background:#2E9E63}
-.ck.bad i{background:#D8342B}
-.ck b{font-weight:500}
-.ck span{font-family:var(--mono);font-size:.86em;color:#6F6B62}
-.ck.bad b,.ck.bad span{color:#B3231C}
-.ui-f{margin-top:.85rem;font-size:.9em;color:#6F6B62}
-#ovl{position:absolute;inset:36px 0 0 0;pointer-events:none}
-.readout{
-  position:absolute;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.7rem;padding:.2rem .45rem;border-radius:3px;
-  background:rgba(11,11,10,.9);color:var(--text);pointer-events:none;opacity:0;letter-spacing:.02em;
-}
-.hint{
-  position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);pointer-events:none;
-  font-size:.9rem;color:var(--dim);background:rgba(11,11,10,.82);padding:.5rem .9rem;border-radius:6px;
-  border:1px solid var(--line-2);transition:opacity .4s var(--ease)
-}
-.bar{
-  position:absolute;display:none;align-items:center;gap:.15rem;padding:.3rem;border-radius:7px;
+#ovl{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#shot{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
+.readout{position:absolute;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.7rem;
+  padding:.2rem .45rem;border-radius:3px;background:rgba(11,11,10,.9);color:var(--text);
+  pointer-events:none;opacity:0;letter-spacing:.02em}
+.hint{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);pointer-events:none;
+  font-size:.9rem;color:var(--text);background:rgba(11,11,10,.86);padding:.5rem .9rem;border-radius:6px;
+  border:1px solid var(--line-2);transition:opacity .4s var(--ease);text-align:center}
+.bar{position:absolute;display:none;align-items:center;gap:.15rem;padding:.3rem;border-radius:7px;
   background:rgba(14,14,13,.94);border:1px solid var(--line-2);backdrop-filter:blur(8px);z-index:3;
-  box-shadow:0 10px 26px -8px rgba(0,0,0,.8)
-}
+  box-shadow:0 10px 26px -8px rgba(0,0,0,.8)}
 .bar.on{display:flex}
-.tool{width:30px;height:28px;border:0;background:transparent;border-radius:5px;color:var(--dim);cursor:pointer;display:grid;place-items:center;transition:background .15s,color .15s}
+.tool{width:30px;height:28px;border:0;background:transparent;border-radius:5px;color:var(--dim);
+  cursor:pointer;display:grid;place-items:center;transition:background .15s,color .15s}
 .tool:hover:not(:disabled){background:#242320;color:var(--text)}
 .tool:disabled{opacity:.35;cursor:default}
 .tool[aria-pressed=true]{background:#302E29;color:var(--text)}
 .tool svg{width:15px;height:15px}
 .sep{width:1px;height:17px;background:var(--line-2);margin:0 .3rem}
-.swatch{width:17px;height:17px;border-radius:50%;border:1.5px solid transparent;cursor:pointer;padding:0;margin:0 1px;transition:transform .15s var(--ease)}
+.swatch{width:17px;height:17px;border-radius:50%;border:1.5px solid transparent;cursor:pointer;
+  padding:0;margin:0 1px;transition:transform .15s var(--ease)}
 .swatch:hover{transform:scale(1.15)}
 .swatch[aria-pressed=true]{border-color:var(--text)}
 .demo-note{margin-top:1rem;font-size:.86rem;color:var(--faint);max-width:68ch}
-.demo-note kbd{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI Symbol",var(--mono);font-size:.82em;color:var(--dim);border:1px solid var(--line-2);border-radius:4px;padding:.05em .35em}
-
-/* manifest */
-.manifest{margin-top:2rem;border-top:1px solid var(--line)}
-.row{display:grid;grid-template-columns:18px minmax(0,1fr) 96px 62px;align-items:center;gap:1rem;
-  width:100%;padding:.72rem .5rem .72rem 0;border:0;border-bottom:1px solid var(--line);
-  background:transparent;color:var(--text);font:inherit;text-align:left;cursor:pointer;transition:background .15s}
-.row:hover{background:#171615}
-.row .chev{width:13px;height:13px;color:var(--faint);transition:transform .2s var(--ease)}
-.row[aria-expanded=true] .chev{transform:rotate(90deg);color:var(--dim)}
-.row[aria-expanded=true]{background:#171615}
-.row .nm{font-size:.95rem}
-.row .rg{font-family:var(--mono);font-size:.78rem;color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
-.row .ct{font-family:var(--mono);font-size:.88rem;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
-.src{border-bottom:1px solid var(--line);background:#0D0D0C;overflow-x:auto}
-.src pre{margin:0;padding:1rem 1.1rem;font-family:var(--mono);font-size:.74rem;line-height:1.75;color:#B9B4A8}
-.total-row{display:grid;grid-template-columns:18px minmax(0,1fr) 96px 62px;align-items:center;gap:1rem;padding:1.05rem .5rem 0 0}
-.total-row .nm{font-weight:600}
-.total-row .ct{font-family:var(--mono);font-size:.88rem;color:var(--mark);font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
-
-/* two-col */
-.cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.5rem,4vw,3.5rem);margin-top:2rem;align-items:start}
-.panel{border:1px solid var(--line);border-radius:9px;background:var(--bg-2);overflow:hidden}
-.panel-head{display:flex;justify-content:space-between;gap:1rem;padding:.6rem .9rem;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.74rem;color:var(--faint);letter-spacing:.02em}
-.panel.shot{border-color:var(--line-2)}
-.panel.shot .panel-body{background:#0B0B0A;box-shadow:inset 0 0 0 1px rgba(236,234,228,.14);user-select:none}
-.panel-head b{font-weight:400;color:var(--dim);font-variant-numeric:tabular-nums}
-.panel-body{padding:1rem .95rem;font-family:var(--mono);font-size:.78rem;line-height:1.8;white-space:pre;overflow-x:auto;color:#B9B4A8}
-
+.demo-note kbd{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI Symbol",var(--mono);
+  font-size:.82em;color:var(--dim);border:1px solid var(--line-2);border-radius:4px;padding:.05em .35em}
 /* live OCR stage */
 .stage{margin-top:1.9rem;border:1px solid var(--line-2);border-radius:9px;background:#0B0B0A;overflow:hidden}
 .stage-head{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;justify-content:space-between;
@@ -307,25 +260,15 @@ verdict, DESIGN.md, and every shipping raster
 <section id="how" class="rule" style="padding-bottom:0">
   <div class="wrap">
     <h2>The gesture, on this page</h2>
-    <p class="sub">Press the hotkey and the screen freezes and dims. Drag a box. Your selection stays lit, and you draw on it there. Nothing has been copied or saved yet, and nothing will be until you say so. Try it below on the kind of screen you would actually send
-      someone: drag a box around the check that failed, then draw on it.</p>
+    <p class="sub">Press the hotkey and the screen freezes and dims. Drag a box. Your selection stays lit, and you draw on it there. Nothing has been copied or saved yet, and nothing will be until you say so. Try it below on a real screenshot: drag a box anywhere on it,
+      then draw on what you want someone to look at.</p>
   </div>
 </section>
 
 <section id="demo-sec">
   <div class="wrap">
     <div class="screen" id="screen" tabindex="0" role="application" aria-label="Interactive demo of the capture gesture">
-      <div class="screen-bar"><span class="screen-title">Pipeline · main · #4471</span></div>
-      <div class="ui" id="code">
-        <div class="ui-h"><span class="ui-t">Checks</span><span class="ui-s">5 passed · 1 failed · 2m 41s</span></div>
-        <div class="ck ok"><i></i><b>lint</b><span>eslint · 14s</span></div>
-        <div class="ck ok"><i></i><b>build</b><span>swiftc · 31s</span></div>
-        <div class="ck ok"><i></i><b>test · unit</b><span>212 passed · 48s</span></div>
-        <div class="ck bad"><i></i><b>test · integration</b><span>1 failed · 2m 14s</span></div>
-        <div class="ck ok"><i></i><b>audit</b><span>0 advisories · 6s</span></div>
-        <div class="ck ok"><i></i><b>size</b><span>+0.4 kB · 3s</span></div>
-        <div class="ui-f">Merging is blocked until every required check passes.</div>
-      </div>
+      <img id="shot" src="shot.webp" width="1800" height="1169" alt="A screenshot of a video page, used here as something to select and mark up">
       <svg id="ovl" aria-hidden="true"></svg>
       <div class="readout" id="readout"></div>
       <div class="hint" id="hint">Drag anywhere on this screen<br><span style="color:var(--faint);font-size:.82em">or focus it and press Enter</span></div>
@@ -440,7 +383,9 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function size(){ var r=ovl.getBoundingClientRect(); W=r.width; H=r.height;
-    ovl.setAttribute('viewBox','0 0 '+W+' '+H); ovl.setAttribute('width',W); ovl.setAttribute('height',H); }
+    // viewBox only: writing width/height attributes pins the element to its own
+    // first measurement, which is how the drag got trapped in a 300x150 corner
+    ovl.setAttribute('viewBox','0 0 '+W+' '+H); }
   function el(n,a){ var e=document.createElementNS(NS,n); for(var k in a) e.setAttribute(k,a[k]); return e; }
 
   function draw(){
@@ -464,7 +409,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     readout.style.opacity=1;
     readout.textContent=Math.round(sel.w*2)+' × '+Math.round(sel.h*2);
     readout.style.left=sel.x+'px';
-    readout.style.top=(sel.y>26? sel.y+36-24 : sel.y+36+sel.h+6)+'px';
+    readout.style.top=(sel.y>26? sel.y-24 : sel.y+sel.h+6)+'px';
   }
 
   function shape(s){
@@ -490,7 +435,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   function placeBar(){
     if(!sel){ bar.classList.remove('on'); return; }
     bar.classList.add('on');
-    var bw=bar.offsetWidth, bh=bar.offsetHeight, top=36;
+    var bw=bar.offsetWidth, bh=bar.offsetHeight, top=0;
     var y=sel.y+top+sel.h+8;
     if(y+bh>H+top-6) y=Math.max(top+6,sel.y+top-bh-8);
     bar.style.left=Math.min(Math.max(6,sel.x+sel.w-bw),W-bw-6)+'px';
@@ -559,7 +504,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     if(mode==='idle'){
       if(k==='enter'||k===' '){        // pointerless way into the demo
         e.preventDefault(); userTook=true;
-        sel={x:W*.03,y:H*.43,w:W*.94,h:H*.15}; mode='editing'; strokes=[];
+        sel={x:W*.02,y:H*.705,w:W*.45,h:H*.055}; mode='editing'; strokes=[];
         hint.style.opacity=0; draw(); placeBar(); syncTools();
       }
       return;
@@ -569,18 +514,30 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     if((e.metaKey||e.ctrlKey)&&k==='z'){ e.preventDefault(); strokes.pop(); draw(); syncTools(); }
   });
 
-  addEventListener('resize',function(){ size(); if(sel){ sel=null;strokes=[];mode='idle';
-    bar.classList.remove('on');hint.style.opacity=1; } draw(); });
-  size(); draw();
-  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ size(); draw(); });
+  // Every coordinate here is derived from the screen's box, and that box is not
+  // final until the screenshot has laid out. A cached image reports complete=true
+  // before layout, so load events are not enough: watch the box itself.
+  var lastW=0, lastH=0, armed=false;
+  function sync(){
+    size();
+    if(Math.abs(W-lastW)<1 && Math.abs(H-lastH)<1) return;
+    lastW=W; lastH=H;
+    sel=null; strokes=[]; cur=null; mode='idle';
+    bar.classList.remove('on'); hint.style.opacity=1;
+    draw();
+    arm();
+  }
+  if(window.ResizeObserver) new ResizeObserver(sync).observe(screen);
+  else addEventListener('resize',sync);
+  sync();
 
   // one authored moment: a ghost drag teaches the gesture, once, then hands over
   function ghost(){
     size();
-    if(reduce){ sel={x:W*.03,y:H*.43,w:W*.94,h:H*.15}; mode='editing';
-      strokes=[{tool:'pen',color:'#E5484D',pts:[[W*.07,H*.545],[W*.30,H*.545]]}];
+    if(reduce){ sel={x:W*.02,y:H*.705,w:W*.45,h:H*.055}; mode='editing';
+      strokes=[{tool:'pen',color:'#E5484D',pts:[[W*.05,H*.752],[W*.42,H*.752]]}];
       hint.style.opacity=0; draw(); placeBar(); syncTools(); return; }
-    var a=[W*.03,H*.43], b=[W*.97,H*.58], t0=null, dur=900;
+    var a=[W*.02,H*.705], b=[W*.47,H*.762], t0=null, dur=900;
     mode='selecting';
     function step(ts){
       if(userTook) return;
@@ -590,7 +547,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
       draw();
       if(k<1) requestAnimationFrame(step);
       else { mode='editing'; placeBar();
-        var p0=[W*.07,H*.545], p1=[W*.30,H*.545], s0=null;
+        var p0=[W*.05,H*.752], p1=[W*.42,H*.752], s0=null;
         function pen(ts2){ if(userTook){ cur=null; return; } if(!s0) s0=ts2;
           var kk=Math.min(1,(ts2-s0)/420), ee=1-Math.pow(1-kk,3);
           cur={tool:'pen',color:'#E5484D',pts:[p0,[p0[0]+(p1[0]-p0[0])*ee,p1[1]]]};
@@ -605,9 +562,13 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     requestAnimationFrame(step);
   }
   var seen=false;
-  new IntersectionObserver(function(en){
-    en.forEach(function(x){ if(x.isIntersecting&&!seen){ seen=true; setTimeout(ghost,320); } });
-  },{threshold:.5}).observe(screen);
+  function arm(){
+    if(armed || H<200) return;           // not a real box yet
+    armed=true;
+    new IntersectionObserver(function(en){
+      en.forEach(function(x){ if(x.isIntersecting&&!seen){ seen=true; setTimeout(ghost,320); } });
+    },{threshold:.35}).observe(screen);
+  }
 
   // ── ambient ascii: the product's own mechanic, drawn in characters ──
   (function(){

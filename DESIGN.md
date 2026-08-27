@@ -73,12 +73,22 @@ Two, and both prove a claim the page makes. Neither is decoration, and that is t
 future one has to pass.
 
 1. **The capture gesture** (hero). Drag on the page: it dims outside your box, lights inside,
-   and the toolbar appears under the selection. The surface being marked up is an authored,
-   deliberately unbranded light app screen — a CI check list with one failure — because that
-   is what people actually screenshot and annotate. It is light so the 50% dim reads.
-   **Never put a real company's UI, logo or a real person there.** A marketing page for an
-   open source tool does not need someone else's trademark on it, and the demo does not get
-   more honest by borrowing one.
+   and the toolbar appears under the selection. The surface is a real screenshot the owner
+   supplied (`docs/shot.webp`), because an authored mock read as a diagram and the point of
+   the demo is recognition — people screenshot pages, not diagrams.
+
+   Recorded because it will come up again: this puts a third party's interface and a real
+   person on the page. I raised that; the owner decided it, twice, and it is their call and
+   their project. If it ever has to go, swap `shot.webp` for another screenshot and retune
+   the four normalized rectangles in the teaching animation and the keyboard entry point —
+   nothing else is coupled to the image.
+
+   Every coordinate in this demo is derived from the screen's measured box, and that box is
+   not final until the image lays out. A cached image reports `complete === true` before
+   layout, so load events are not enough: a `ResizeObserver` on `.screen` is what keeps the
+   overlay honest. Writing the measured size into the SVG's `width`/`height` attributes is
+   what once pinned it to its own first measurement and trapped every drag in a 300×150
+   corner — set the `viewBox` and nothing else.
 2. **The OCR reconstruction** (OCR section). `Overlay.layout(_:)` ported to JS, running for
    real in the visitor's browser on fragments carrying synthetic Vision-like noise. Three
    steps: boxes, rows resolved (red bands show the grouping), columns resolved. The last step
