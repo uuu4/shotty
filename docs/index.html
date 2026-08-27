@@ -134,6 +134,40 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
 .demo-note{margin-top:1rem;font-size:.86rem;color:var(--faint);max-width:68ch}
 .demo-note kbd{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI Symbol",var(--mono);
   font-size:.82em;color:var(--dim);border:1px solid var(--line-2);border-radius:4px;padding:.05em .35em}
+/* manifest */
+.manifest{margin-top:2rem;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:18px minmax(0,1fr) 96px 62px;align-items:center;gap:1rem;
+  width:100%;padding:.72rem .5rem .72rem 0;border:0;border-bottom:1px solid var(--line);
+  background:transparent;color:var(--text);font:inherit;text-align:left;cursor:pointer;
+  transition:background .15s}
+.row:hover{background:#171615}
+.row .chev{width:13px;height:13px;flex:none;color:var(--faint);transition:transform .2s var(--ease)}
+.row[aria-expanded=true]{background:#171615}
+.row[aria-expanded=true] .chev{transform:rotate(90deg);color:var(--dim)}
+.row .nm{font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .rg,.total-row .rg{font-family:var(--mono);font-size:.78rem;color:var(--faint);
+  text-align:right;font-variant-numeric:tabular-nums}
+.row .ct{font-family:var(--mono);font-size:.88rem;color:var(--dim);text-align:right;
+  font-variant-numeric:tabular-nums}
+.src{border-bottom:1px solid var(--line);background:#0D0D0C;overflow-x:auto}
+.src pre{margin:0;padding:1rem 1.1rem;font-family:var(--mono);font-size:.74rem;line-height:1.75;color:#B9B4A8}
+.src .k{color:#C58AF0}.src .c{color:#8A8579}.src .num{color:#E0A458}
+.total-row{display:grid;grid-template-columns:18px minmax(0,1fr) 96px 62px;align-items:center;
+  gap:1rem;padding:1.05rem .5rem 0 0}
+.total-row .nm{font-weight:600}
+.total-row .ct{font-family:var(--mono);font-size:.88rem;color:var(--mark);font-weight:500;
+  text-align:right;font-variant-numeric:tabular-nums}
+
+/* two-col */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.5rem,4vw,3.5rem);margin-top:2rem;align-items:start}
+.panel{border:1px solid var(--line);border-radius:9px;background:var(--bg-2);overflow:hidden}
+.panel-head{display:flex;justify-content:space-between;gap:1rem;padding:.6rem .9rem;
+  border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.74rem;
+  color:var(--faint);letter-spacing:.02em}
+.panel-head b{font-weight:400;color:var(--dim);font-variant-numeric:tabular-nums}
+.panel-body{padding:1rem .95rem;font-family:var(--mono);font-size:.78rem;line-height:1.8;
+  white-space:pre;overflow-x:auto;color:#B9B4A8}
+
 /* live OCR stage */
 .stage{margin-top:1.9rem;border:1px solid var(--line-2);border-radius:9px;background:#0B0B0A;overflow:hidden}
 .stage-head{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;justify-content:space-between;
@@ -268,7 +302,7 @@ verdict, DESIGN.md, and every shipping raster
 <section id="demo-sec">
   <div class="wrap">
     <div class="screen" id="screen" tabindex="0" role="application" aria-label="Interactive demo of the capture gesture">
-      <img id="shot" src="shot.webp" width="1800" height="1169" alt="A screenshot of a video page, used here as something to select and mark up">
+      <img id="shot" draggable="false" src="shot.webp" width="1800" height="1169" alt="A screenshot of a video page, used here as something to select and mark up">
       <svg id="ovl" aria-hidden="true"></svg>
       <div class="readout" id="readout"></div>
       <div class="hint" id="hint">Drag anywhere on this screen<br><span style="color:var(--faint);font-size:.82em">or focus it and press Enter</span></div>
@@ -445,8 +479,11 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   function pt(e){ var r=ovl.getBoundingClientRect();
     return [Math.max(0,Math.min(W,e.clientX-r.left)),Math.max(0,Math.min(H,e.clientY-r.top))]; }
 
+  screen.addEventListener('dragstart',function(e){ e.preventDefault(); });
   screen.addEventListener('pointerdown',function(e){
     if(e.target.closest('#bar')) return;
+    e.preventDefault();            // otherwise the browser starts dragging the image
+    screen.focus({preventScroll:true});   // preventDefault swallows focus; take it back without scrolling the page
     userTook=true;                 // stops the teaching animation mid-flight
     screen.setPointerCapture(e.pointerId);
     hint.style.opacity=0;
