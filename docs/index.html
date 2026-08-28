@@ -954,7 +954,9 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   var out='';
   // every bar is a share of the largest region, so the widths compare across rows
   var peak=D.regions.reduce(function(m,r){ return r.lines>m ? r.lines : m; }, 0);
-  function bar(n){                                  // decorative: the count beside it is the text
+  // named for its class, and never `bar`: the demo's toolbar element is `bar` in this
+  // same scope, and a function declaration here overwrites it
+  function mbar(n){                                 // decorative: the count beside it is the text
     return '<span class="mbar" aria-hidden="true"><i style="width:'+
       (n/peak*100).toFixed(1)+'%"></i></span>';
   }
@@ -962,7 +964,7 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
     out+='<button class="row" aria-expanded="false" aria-controls="src'+i+'">'+CHEV+
       '<span class="nm">'+r.name+'</span>'+
       '<span class="rg">'+r.from+'–'+r.to+'</span>'+
-      bar(r.lines)+
+      mbar(r.lines)+
       '<span class="ct">'+r.lines+'</span></button>'+
       '<div class="src" id="src'+i+'" hidden><pre tabindex="0"></pre></div>';
   });

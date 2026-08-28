@@ -200,7 +200,7 @@ Themed, not defaulted: `::selection` in tinted mark red, `:focus-visible` as a 2
 at 3px offset, scrollbars in `--line-2` on the ground with a 3px inset. These are cheap and
 they are the difference between built and assembled.
 
-## Two failure modes this page has already hit
+## Three failure modes this page has already hit
 
 **Class-name collisions.** `.steps` was the OCR stage's segmented control and also
 `ol.steps` in Install. `display:flex` from one laid the other out sideways and made the
@@ -212,9 +212,22 @@ whole page scroll horizontally. Component classes here are prefixed by their own
 table — widens the column past the viewport and the page scrolls sideways. Every grid
 child that can contain preformatted content carries `min-width:0`.
 
-Neither is caught by the detector or by looking at a desktop screenshot. The check that
+**The same collision, in JavaScript.** The whole page script is one IIFE, so
+`function bar(n)` written for the manifest and `var bar = document.getElementById('bar')`
+written for the demo toolbar are the *same binding*. The function declaration wins, the
+demo's `bar.classList` becomes `undefined`, and the toolbar and the clipboard panel both
+die on the first drag. That shipped. Identifiers inside this script are prefixed by their
+owner exactly like the classes are: it is `mbar`, not `bar`.
+
+The first two are not caught by the detector or by a desktop screenshot. The check that
 finds them is one line: compare `document.documentElement.scrollWidth` to `clientWidth`
 at a narrow width, and if they differ, list every element whose `right` exceeds it.
+
+The third is not caught by *anything* static. Both demos run only on pointer input, so
+their exceptions fire on interaction and never on load — a clean console at load time is
+not evidence. `tools/check-demo.sh` drives a real drag and a real stroke in headless
+Chrome and asserts the toolbar appeared, the clipboard panel filled, and the readout
+carries a size. **Run it before pushing any change to `docs/index.html`.**
 
 ## Rules that outlive this page
 
