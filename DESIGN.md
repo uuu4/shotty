@@ -58,8 +58,15 @@ category's laziest container and the proof sections replace it.
 
 - **Terminal block** — bordered panel, muted head, `white-space: pre`. Prompts in
   `--ghost`, commands in `--text`, verified numbers in `--mark`, comments in `--dim`.
-- **Manifest row** — three columns: name, a shared 150px bar track, a tabular count. The
-  shared track is what makes it read as data instead of stray dashes.
+- **Manifest row** — name, line range, a shared 150px bar track (`.mbar`), a tabular count.
+  Every bar is a share of the *largest region*, not of the total: on a 394-line scale the
+  7-line hotkey is a 3px sliver and the section stops being a comparison. The track is what
+  makes it read as a distribution instead of a column of unrelated numbers. The total row
+  carries no bar — on the rows' scale a full one reads as "the same size as OCR", and the
+  red 394 already carries the sum.
+
+  It is `.mbar`, not `.bar`, because `.bar` is the demo toolbar and is `display:none` until
+  a selection exists. Shipped invisible once for exactly that reason.
 - **Panels** — `.panel` for text, `.panel.shot` for anything representing a captured screen
   (darker ground `#0B0B0A`, inset 1px light rule standing in for the lit selection, size
   readout in the head).
@@ -166,6 +173,18 @@ Both are content-hashed into their URLs, along with every local asset. That is n
 every figure on this page comes out of `source.js`, so a cached copy is the page quoting
 numbers that have moved, and `og.png` is cached by unfurlers under a URL that would outlive
 any redesign of the card.
+
+## Hero composition
+
+Three grid areas, not two: copy and the glyph field share the top row top-aligned, and the
+terminal proof spans the full width beneath them with its note beside it. The proof used to
+be the fifth thing stacked in the copy column, which made that column 752px against the
+field's 243px and left a quarter of the hero empty *next to the headline* — the most
+prominent void a page can have. Row gap is 0 and the band carries its own margin; both
+applied put an 80px hole under the buttons.
+
+The right column is 36%. At 40% the copy column drops below the width of the two CTA
+buttons and they stack, which is worse than the void it was fixing.
 
 ## Motion
 

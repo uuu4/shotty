@@ -77,12 +77,21 @@ nav .links a{transition:color .18s}
 nav .links a:hover{color:var(--text)}
 
 /* hero */
-header .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,34%);gap:clamp(1.5rem,3.5vw,3rem);align-items:center}
+header .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,36%);
+  /* row gap is 0: the proof band carries its own margin, and both applied put an
+     80px hole under the buttons */
+  gap:0 clamp(1.5rem,3.5vw,3rem);align-items:start}
+/* the proof is the pitch, so it gets its own full-width band rather than being the
+   fifth thing stacked in the copy column */
+header .hero-proof{grid-column:1/-1;display:grid;
+  grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:clamp(1.5rem,3.5vw,3rem);
+  align-items:end;margin-top:clamp(1.75rem,4vw,2.75rem)}
+header .hero-proof .proof-note{margin:0 0 .35rem}
 /* grid items default to min-width:auto, so any white-space:pre child (a command,
    a terminal block, a table) widens the track past the viewport. Pin them to 0. */
 .hero-copy,.cols>*,footer .cols2>*{min-width:0}
 .ascii{position:relative;aspect-ratio:1800/1169;width:100%;overflow:hidden;
-  border-radius:6px;background:var(--bg);margin-right:calc(var(--pad) * -1)}
+  border-radius:6px;background:var(--bg);margin-right:calc(var(--pad) * -1);margin-top:.5rem}
 #asciiGrid{position:absolute;inset:0;margin:0;font-family:var(--mono);white-space:pre;
   color:#7E7A6F;letter-spacing:0;user-select:none}
 #asciiImg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;
@@ -91,7 +100,8 @@ header .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,34%);
 #asciiRo{position:absolute;font-family:var(--mono);font-size:9px;letter-spacing:.02em;
   font-variant-numeric:tabular-nums;color:var(--text);background:rgba(11,11,10,.9);
   padding:1px 4px;border-radius:2px;opacity:0}
-@media (max-width:1000px){header .wrap{grid-template-columns:1fr}.ascii{display:none}}
+@media (max-width:1000px){header .wrap{grid-template-columns:1fr}.ascii{display:none}
+  header .hero-proof{grid-template-columns:1fr;align-items:start;gap:1rem}}
 
 header{padding:clamp(4rem,11vw,7.5rem) 0 clamp(2.5rem,5vw,3.5rem)}
 h1{
@@ -174,7 +184,7 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
   font-size:.82em;color:var(--dim);border:1px solid var(--line-2);border-radius:4px;padding:.05em .35em}
 /* manifest */
 .manifest{margin-top:2rem;border-top:1px solid var(--line)}
-.row{display:grid;grid-template-columns:18px minmax(0,1fr) 96px 62px;align-items:center;gap:1rem;
+.row{display:grid;grid-template-columns:18px minmax(0,1fr) 96px 150px 62px;align-items:center;gap:1rem;
   width:100%;padding:.72rem .5rem .72rem 0;border:0;border-bottom:1px solid var(--line);
   background:transparent;color:var(--text);font:inherit;text-align:left;cursor:pointer;
   transition:background .15s}
@@ -187,6 +197,12 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
   text-align:right;font-variant-numeric:tabular-nums}
 .row .ct{font-family:var(--mono);font-size:.88rem;color:var(--dim);text-align:right;
   font-variant-numeric:tabular-nums}
+/* one scale across every row: this is what makes the section a distribution
+   instead of a column of unrelated numbers */
+.row .mbar{height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.row .mbar i{display:block;height:100%;background:var(--faint);
+  transition:background .15s var(--ease)}
+.row:hover .mbar i,.row[aria-expanded=true] .mbar i{background:var(--text)}
 .src{border-bottom:1px solid var(--line);background:#0D0D0C;overflow-x:auto}
 .src pre{outline-offset:-3px}
 .src pre{margin:0;padding:1rem 1.1rem 1rem 0;font-family:var(--mono);font-size:.74rem;
@@ -195,7 +211,7 @@ h2{font-size:clamp(1.55rem,3vw,2.15rem);font-weight:600;letter-spacing:-.028em;l
 .src .l::before{content:counter(l);display:inline-block;width:3.4em;padding-right:1.1em;
   text-align:right;color:var(--faint);font-variant-numeric:tabular-nums;user-select:none}
 .src .k{color:#C58AF0}.src .c{color:#8A8579}.src .num{color:#E0A458}
-.total-row{display:grid;grid-template-columns:18px minmax(0,1fr) 96px 62px;align-items:center;
+.total-row{display:grid;grid-template-columns:18px minmax(0,1fr) 96px 150px 62px;align-items:center;
   gap:1rem;padding:1.05rem .5rem 0 0}
 .total-row .nm{font-weight:600}
 .total-row .ct{font-family:var(--mono);font-size:.88rem;color:var(--mark);font-weight:500;
@@ -258,7 +274,10 @@ ol.steps li::before{
 ol.steps b{color:var(--text);font-weight:500}
 .cmd{
   display:block;margin-top:.55rem;font-family:var(--mono);font-size:.8rem;color:var(--text);
-  background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:.6rem .75rem;overflow-x:auto;white-space:pre
+  background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:.6rem .75rem;
+  /* the one-line install command ran off the panel with no way to see it went further;
+     pre-wrap keeps the authored line breaks and lets the long one fold instead */
+  overflow-x:auto;white-space:pre-wrap
 }
 
 footer{border-top:1px solid var(--line);padding:3rem 0 4rem;color:var(--faint);font-size:.9rem}
@@ -274,7 +293,7 @@ footer a:hover{color:var(--text);border-color:var(--dim)}
   .foot-links{text-align:left;flex-direction:row;gap:1.25rem;flex-wrap:wrap}
   nav .links{gap:1.15rem;font-size:.84rem}
   nav .links a[data-hide]{display:none}
-  .row,.total-row{grid-template-columns:14px minmax(0,1fr) 56px;gap:.7rem}
+  .row,.total-row{grid-template-columns:14px minmax(0,1fr) 64px 56px;gap:.7rem}
   .row .rg{display:none}
 }
 @media (prefers-reduced-motion:reduce){
@@ -328,7 +347,14 @@ verdict, DESIGN.md, and every shipping raster
       <a class="btn btn-ghost" href="https://github.com/uuu4/shotty/blob/main/main.swift">Read main.swift</a>
     </div>
     <p class="plat">macOS 13 or later</p>
-
+   </div>
+   <div class="ascii" id="ascii" aria-hidden="true">
+     <pre id="asciiGrid"></pre>
+     <img id="asciiImg" src="shot-sm.webp?v=83f7739a" alt="" draggable="false" fetchpriority="high">
+     <div id="asciiWin"></div>
+     <span id="asciiRo"></span>
+   </div>
+   <div class="hero-proof">
     <div class="proof">
       <div class="proof-head">verify it yourself</div>
       <div class="proof-body" tabindex="0" role="group" aria-label="Verification commands"><span class="p">$ </span><span class="c">wc -l main.swift</span>
@@ -339,12 +365,6 @@ verdict, DESIGN.md, and every shipping raster
 <span class="n">0</span><span class="o">     # there is no network code</span></div>
     </div>
     <p class="proof-note">Those three commands are the entire pitch. Run them before you run anything else.</p>
-   </div>
-   <div class="ascii" id="ascii" aria-hidden="true">
-     <pre id="asciiGrid"></pre>
-     <img id="asciiImg" src="shot-sm.webp?v=83f7739a" alt="" draggable="false" fetchpriority="high">
-     <div id="asciiWin"></div>
-     <span id="asciiRo"></span>
    </div>
   </div>
 </header>
@@ -932,15 +952,23 @@ cd shotty &amp;&amp; ./build.sh &amp;&amp; open Shotty.app</code></li>
   var CHEV='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
     'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
   var out='';
+  // every bar is a share of the largest region, so the widths compare across rows
+  var peak=D.regions.reduce(function(m,r){ return r.lines>m ? r.lines : m; }, 0);
+  function bar(n){                                  // decorative: the count beside it is the text
+    return '<span class="mbar" aria-hidden="true"><i style="width:'+
+      (n/peak*100).toFixed(1)+'%"></i></span>';
+  }
   D.regions.forEach(function(r,i){
     out+='<button class="row" aria-expanded="false" aria-controls="src'+i+'">'+CHEV+
       '<span class="nm">'+r.name+'</span>'+
       '<span class="rg">'+r.from+'–'+r.to+'</span>'+
+      bar(r.lines)+
       '<span class="ct">'+r.lines+'</span></button>'+
       '<div class="src" id="src'+i+'" hidden><pre tabindex="0"></pre></div>';
   });
   out+='<div class="total-row"><span></span><span class="nm">main.swift</span>'+
-    '<span class="rg">1–'+D.fileLines+'</span><span class="ct">'+D.total+'</span></div>';
+    '<span class="rg">1–'+D.fileLines+'</span><span></span>'+
+    '<span class="ct">'+D.total+'</span></div>';
   var man=document.getElementById('manifest');
   man.innerHTML=out;
   // the source itself is 91% of the payload and most people never open a row,
